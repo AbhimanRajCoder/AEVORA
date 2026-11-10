@@ -8,6 +8,8 @@ import cors from 'cors';
 import { sendSuccess } from './utils/responseHelper.js';
 import { logInfo, logError } from './utils/logger.js';
 import { notFoundHandler, errorHandler } from './middleware/errorMiddleware.js';
+import moduleRoute from './routes/moduleRoute.js';
+import lessonRoute from './routes/lessonRoute.js';
 
 // Load environment variables from .env file
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -37,6 +39,15 @@ app.use(
 // Parse incoming JSON request bodies
 app.use(express.json());
 
+// Root health check endpoint
+app.get('/', (_req, res) => {
+  return sendSuccess(res, {
+    name: 'Disaster Preparedness & Management Education API',
+    status: 'online',
+    timestamp: new Date().toISOString(),
+  });
+});
+
 // Base health check endpoint under /api/v1
 app.get('/api/v1/health', (_req, res) => {
   return sendSuccess(res, {
@@ -44,6 +55,10 @@ app.get('/api/v1/health', (_req, res) => {
     timestamp: new Date().toISOString(),
   });
 });
+
+// API routes under /api/v1
+app.use('/api/v1/modules', moduleRoute);
+app.use('/api/v1/lessons', lessonRoute);
 
 // Catch-all route for unhandled endpoints
 app.use(notFoundHandler);
