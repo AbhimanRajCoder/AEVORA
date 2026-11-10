@@ -15,6 +15,7 @@ import drillRoute from './routes/drillRoute.js';
 import leaderboardRoute from './routes/leaderboardRoute.js';
 import contactRoute from './routes/contactRoute.js';
 import alertRoute from './routes/alertRoute.js';
+import dashboardRoute from './routes/dashboardRoute.js';
 
 // Load environment variables from .env file
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -69,6 +70,7 @@ app.use('/api/v1/drills', drillRoute);
 app.use('/api/v1/leaderboard', leaderboardRoute);
 app.use('/api/v1/contacts', contactRoute);
 app.use('/api/v1/alerts', alertRoute);
+app.use('/api/v1/dashboard', dashboardRoute);
 
 // Catch-all route for unhandled endpoints
 app.use(notFoundHandler);
