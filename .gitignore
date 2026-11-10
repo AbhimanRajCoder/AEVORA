@@ -1,0 +1,23 @@
+# Node dependencies
+node_modules/
+dist/
+coverage/
+
+# Environment variables
+.env
+.env.local
+backend/.env
+
+# Logs
+*.log
+npm-debug.log*
+
+# Supabase local
+supabase/.temp/
+
+# OS files
+.DS_Store
+Thumbs.db
+PRD.MD
+RULES.MD
+CHECKLIST.MD
