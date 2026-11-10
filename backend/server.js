@@ -11,6 +11,7 @@ import { notFoundHandler, errorHandler } from './middleware/errorMiddleware.js';
 import moduleRoute from './routes/moduleRoute.js';
 import lessonRoute from './routes/lessonRoute.js';
 import quizRoute from './routes/quizRoute.js';
+import drillRoute from './routes/drillRoute.js';
 
 // Load environment variables from .env file
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -61,6 +62,7 @@ app.get('/api/v1/health', (_req, res) => {
 app.use('/api/v1/modules', moduleRoute);
 app.use('/api/v1/lessons', lessonRoute);
 app.use('/api/v1/quizzes', quizRoute);
+app.use('/api/v1/drills', drillRoute);
 
 // Catch-all route for unhandled endpoints
 app.use(notFoundHandler);
