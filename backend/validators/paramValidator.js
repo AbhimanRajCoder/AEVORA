@@ -5,18 +5,31 @@ import { sendError } from '../utils/responseHelper.js';
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /**
- * Validates that the 'id' parameter in req.params is a valid UUID.
- * @param {object} req - Express request object.
- * @param {object} res - Express response object.
- * @param {function} next - Express next middleware function.
- * @returns {void} Calls next() or returns 400 Bad Request.
+ * Validates that a route param (defaults to 'id') is a valid UUID format.
+ * Can be used as middleware directly or as a middleware factory with a param name.
+ * @param {string|object} paramNameOrReq - Parameter name or Express request object.
+ * @returns {function|void} Express middleware function or execution result.
  */
-export const validateUuidParam = (req, res, next) => {
-  const { id } = req.params;
+export const validateUuidParam = (paramNameOrReq = 'id') => {
+  if (typeof paramNameOrReq === 'object' && paramNameOrReq.params) {
+    const req = paramNameOrReq;
+    const res = arguments[1];
+    const next = arguments[2];
+    const value = req.params.id;
 
-  if (!id || !UUID_REGEX.test(id)) {
-    return sendError(res, 'Invalid ID format: must be a valid UUID', 400);
+    if (!value || !UUID_REGEX.test(value)) {
+      return sendError(res, 'Invalid ID format: must be a valid UUID', 400);
+    }
+    return next();
   }
 
-  return next();
+  const paramName = typeof paramNameOrReq === 'string' ? paramNameOrReq : 'id';
+  return (req, res, next) => {
+    const value = req.params[paramName];
+    if (!value || !UUID_REGEX.test(value)) {
+      return sendError(res, `Invalid ${paramName} format: must be a valid UUID`, 400);
+    }
+    return next();
+  };
 };
+

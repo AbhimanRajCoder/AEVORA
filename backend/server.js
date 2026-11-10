@@ -10,6 +10,7 @@ import { logInfo, logError } from './utils/logger.js';
 import { notFoundHandler, errorHandler } from './middleware/errorMiddleware.js';
 import moduleRoute from './routes/moduleRoute.js';
 import lessonRoute from './routes/lessonRoute.js';
+import quizRoute from './routes/quizRoute.js';
 
 // Load environment variables from .env file
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -59,6 +60,7 @@ app.get('/api/v1/health', (_req, res) => {
 // API routes under /api/v1
 app.use('/api/v1/modules', moduleRoute);
 app.use('/api/v1/lessons', lessonRoute);
+app.use('/api/v1/quizzes', quizRoute);
 
 // Catch-all route for unhandled endpoints
 app.use(notFoundHandler);

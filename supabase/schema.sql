@@ -147,12 +147,17 @@ BEGIN
     INSERT INTO public.profiles (id, full_name, role, institution_id, points)
     VALUES (
         NEW.id,
-        COALESCE(NEW.raw_user_meta_data->>'full_name', 'New User'),
+        COALESCE(
+            NEW.raw_user_meta_data->>'full_name',
+            NEW.raw_user_meta_data->>'name',
+            split_part(NEW.email, '@', 1),
+            'Student User'
+        ),
         COALESCE(NEW.raw_user_meta_data->>'role', 'student'),
         CASE 
             WHEN NEW.raw_user_meta_data->>'institution_id' IS NOT NULL 
             THEN (NEW.raw_user_meta_data->>'institution_id')::UUID 
-            ELSE NULL 
+            ELSE (SELECT id FROM public.institutions ORDER BY created_at ASC LIMIT 1) 
         END,
         0
     )
