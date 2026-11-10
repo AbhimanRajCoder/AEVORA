@@ -13,6 +13,7 @@ import lessonRoute from './routes/lessonRoute.js';
 import quizRoute from './routes/quizRoute.js';
 import drillRoute from './routes/drillRoute.js';
 import leaderboardRoute from './routes/leaderboardRoute.js';
+import contactRoute from './routes/contactRoute.js';
 
 // Load environment variables from .env file
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -65,6 +66,7 @@ app.use('/api/v1/lessons', lessonRoute);
 app.use('/api/v1/quizzes', quizRoute);
 app.use('/api/v1/drills', drillRoute);
 app.use('/api/v1/leaderboard', leaderboardRoute);
+app.use('/api/v1/contacts', contactRoute);
 
 // Catch-all route for unhandled endpoints
 app.use(notFoundHandler);
