@@ -1,5 +1,7 @@
 // Main entry point for the Express backend server.
 
+import path from 'path';
+import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import express from 'express';
 import cors from 'cors';
@@ -8,6 +10,8 @@ import { logInfo, logError } from './utils/logger.js';
 import { notFoundHandler, errorHandler } from './middleware/errorMiddleware.js';
 
 // Load environment variables from .env file
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.resolve(__dirname, '.env') });
 dotenv.config();
 
 const app = express();
