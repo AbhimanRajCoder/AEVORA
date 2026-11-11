@@ -11,6 +11,7 @@ import { LessonReaderScreen } from '../screens/student/LessonReaderScreen';
 import { QuizScreen } from '../screens/student/QuizScreen';
 import { QuizResultScreen } from '../screens/student/QuizResultScreen';
 import { DrillsListScreen } from '../screens/student/DrillsListScreen';
+import { DrillSimulationScreen } from '../screens/student/DrillSimulationScreen';
 import { LeaderboardScreen } from '../screens/student/LeaderboardScreen';
 import { AlertsScreen } from '../screens/shared/AlertsScreen';
 import { EmergencyContactsScreen } from '../screens/shared/EmergencyContactsScreen';
@@ -86,6 +87,11 @@ export const StudentNavigator = () => (
       name="QuizResult"
       component={QuizResultScreen}
       options={{ title: 'Quiz Results' }}
+    />
+    <Stack.Screen
+      name="DrillSimulation"
+      component={DrillSimulationScreen}
+      options={({ route }) => ({ title: route.params?.title || 'Virtual Drill' })}
     />
     <Stack.Screen
       name="Leaderboard"
