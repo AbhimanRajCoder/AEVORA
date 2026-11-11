@@ -109,7 +109,7 @@ export const ModuleDetailScreen = ({ route, navigation }) => {
             >
               <Card variant="light">
                 <View style={styles.lessonTop}>
-                  <Text style={styles.serifIndex}>Lesson 0{index + 1}</Text>
+                  <Text style={styles.serifIndex}>Lesson {String(index + 1).padStart(2, '0')}</Text>
                   <View style={[styles.statusChip, lesson.is_completed && styles.statusChipDone]}>
                     <Text style={[styles.statusText, lesson.is_completed && styles.statusTextDone]}>
                       {lesson.is_completed ? '✓ COMPLETED' : 'READ'}

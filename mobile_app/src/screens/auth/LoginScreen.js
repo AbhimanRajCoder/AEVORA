@@ -1,6 +1,6 @@
-// Login screen in Forest Depths dark canvas with Electric Sprout pill CTA and focus borders.
+// Login screen in Forest Depths dark canvas with password reveal toggle and keyboard chaining.
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -20,8 +20,11 @@ import { COLORS, FONTS, RADIUS, SPACING, TYPE } from '../../constants/theme';
 export const LoginScreen = ({ navigation }) => {
   const insets = useSafeAreaInsets();
   const { signIn } = useAuth();
+  const passwordRef = useRef(null);
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [focusedField, setFocusedField] = useState(null);
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -76,7 +79,10 @@ export const LoginScreen = ({ navigation }) => {
           <TextInput
             style={[styles.input, focusedField === 'email' && styles.inputFocused]}
             value={email}
-            onChangeText={setEmail}
+            onChangeText={(val) => {
+              setEmail(val);
+              if (error) setError('');
+            }}
             onFocus={() => setFocusedField('email')}
             onBlur={() => setFocusedField(null)}
             placeholder="student@institution.edu"
@@ -84,21 +90,45 @@ export const LoginScreen = ({ navigation }) => {
             keyboardType="email-address"
             autoCapitalize="none"
             autoCorrect={false}
+            returnKeyType="next"
+            onSubmitEditing={() => passwordRef.current?.focus()}
+            textContentType="emailAddress"
           />
 
           <Text style={styles.label}>PASSWORD</Text>
-          <TextInput
-            style={[styles.input, focusedField === 'password' && styles.inputFocused]}
-            value={password}
-            onChangeText={setPassword}
-            onFocus={() => setFocusedField('password')}
-            onBlur={() => setFocusedField(null)}
-            placeholder="Enter your password"
-            placeholderTextColor={COLORS.lichenSage}
-            secureTextEntry
-          />
+          <View style={[styles.passwordRow, focusedField === 'password' && styles.inputFocused]}>
+            <TextInput
+              ref={passwordRef}
+              style={styles.passwordInput}
+              value={password}
+              onChangeText={(val) => {
+                setPassword(val);
+                if (error) setError('');
+              }}
+              onFocus={() => setFocusedField('password')}
+              onBlur={() => setFocusedField(null)}
+              placeholder="Enter your password"
+              placeholderTextColor={COLORS.lichenSage}
+              secureTextEntry={!showPassword}
+              returnKeyType="done"
+              onSubmitEditing={handleLogin}
+              textContentType="password"
+            />
+            <Pressable
+              onPress={() => setShowPassword((prev) => !prev)}
+              hitSlop={8}
+              accessibilityRole="button"
+              accessibilityLabel={showPassword ? 'Hide password' : 'Show password'}
+            >
+              <Text style={styles.toggleText}>{showPassword ? 'Hide' : 'Show'}</Text>
+            </Pressable>
+          </View>
 
-          {error ? <Text style={styles.error}>{error}</Text> : null}
+          {error ? (
+            <View style={styles.errorBox}>
+              <Text style={styles.errorText}>{error}</Text>
+            </View>
+          ) : null}
 
           <PrimaryButton label="Sign In" onPress={handleLogin} isLoading={isSubmitting} />
 
@@ -116,11 +146,7 @@ export const LoginScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   canvas: { flex: 1, backgroundColor: COLORS.forestDepths },
   orbTopRight: { top: -110, right: -90 },
-  container: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    paddingHorizontal: SPACING.s24,
-  },
+  container: { flexGrow: 1, justifyContent: 'center', paddingHorizontal: SPACING.s24 },
   announcementPill: {
     alignSelf: 'flex-start',
     borderWidth: 1,
@@ -130,24 +156,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.s16,
     marginBottom: SPACING.s24,
   },
-  announcementText: {
-    ...TYPE.body,
-    color: COLORS.pureWhite,
-  },
-  sproutText: {
-    color: COLORS.electricSprout,
-  },
-  heroTitle: {
-    fontFamily: FONTS.display,
-    ...TYPE.displayHero,
-    color: COLORS.pureWhite,
-    marginBottom: SPACING.s16,
-  },
-  heroSubtitle: {
-    ...TYPE.bodyMd,
-    color: COLORS.paleFern,
-    marginBottom: SPACING.s32,
-  },
+  announcementText: { ...TYPE.body, color: COLORS.pureWhite },
+  sproutText: { color: COLORS.electricSprout },
+  heroTitle: { fontFamily: FONTS.display, ...TYPE.displayHero, color: COLORS.pureWhite, marginBottom: SPACING.s16 },
+  heroSubtitle: { ...TYPE.bodyMd, color: COLORS.paleFern, marginBottom: SPACING.s32 },
   darkPanel: {
     backgroundColor: COLORS.forestDepths,
     borderWidth: 1,
@@ -173,24 +185,39 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.forestDepths,
     marginBottom: SPACING.s16,
   },
-  inputFocused: {
-    borderColor: COLORS.electricSprout,
-  },
-  error: {
-    ...TYPE.body,
-    color: COLORS.electricSprout,
+  passwordRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: COLORS.mossShadow,
+    borderRadius: RADIUS.input,
+    paddingHorizontal: SPACING.s16,
+    backgroundColor: COLORS.forestDepths,
     marginBottom: SPACING.s16,
   },
-  linkRow: {
-    marginTop: SPACING.s24,
-    alignItems: 'center',
+  passwordInput: {
+    flex: 1,
+    paddingVertical: 14,
+    fontSize: 15,
+    color: COLORS.pureWhite,
   },
-  linkText: {
-    ...TYPE.body,
-    color: COLORS.paleFern,
-  },
-  linkUnderline: {
+  toggleText: {
+    ...TYPE.caption,
+    fontWeight: '600',
     color: COLORS.electricSprout,
-    textDecorationLine: 'underline',
+    marginLeft: SPACING.s8,
   },
+  inputFocused: { borderColor: COLORS.electricSprout },
+  errorBox: {
+    borderWidth: 1,
+    borderColor: COLORS.electricSprout,
+    borderRadius: RADIUS.buttonCompact,
+    padding: SPACING.s12,
+    marginBottom: SPACING.s16,
+    backgroundColor: COLORS.mossShadow,
+  },
+  errorText: { ...TYPE.body, color: COLORS.electricSprout },
+  linkRow: { marginTop: SPACING.s24, alignItems: 'center' },
+  linkText: { ...TYPE.body, color: COLORS.paleFern },
+  linkUnderline: { color: COLORS.electricSprout, textDecorationLine: 'underline' },
 });

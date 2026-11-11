@@ -1,6 +1,6 @@
 // Global authentication context managing session restoration and backend-only auth actions.
 
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import * as authService from '../services/authService';
 import { getTokens, clearTokens } from '../services/tokenStorage';
 import { setUnauthorizedHandler } from '../services/apiClient';
@@ -41,28 +41,28 @@ export const AuthProvider = ({ children }) => {
     restoreSession();
   }, [restoreSession]);
 
-  const signIn = async (credentials) => {
+  const signIn = useCallback(async (credentials) => {
     const authData = await authService.login(credentials);
     setUser(authData.user);
     return authData.user;
-  };
+  }, []);
 
-  const signUp = async (payload) => {
+  const signUp = useCallback(async (payload) => {
     const authData = await authService.signup(payload);
     setUser(authData.user);
     return authData.user;
-  };
+  }, []);
 
-  const signOut = async () => {
+  const signOut = useCallback(async () => {
     await authService.logout();
     setUser(null);
-  };
+  }, []);
 
-  const refreshUser = async () => {
+  const refreshUser = useCallback(async () => {
     const profile = await authService.getMe();
     setUser(profile);
     return profile;
-  };
+  }, []);
 
   return (
     <AuthContext.Provider
@@ -88,4 +88,3 @@ export const useAuth = () => {
   }
   return context;
 };
-

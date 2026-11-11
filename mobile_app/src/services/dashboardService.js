@@ -1,9 +1,6 @@
-// Admin dashboard and backend health API calls.
+// Backend health check API call.
 
 import { ENDPOINTS } from '../constants/api';
 import { apiRequest } from './apiClient';
 
-export const getDashboardStats = () => apiRequest(ENDPOINTS.DASHBOARD);
-
 export const checkHealth = () => apiRequest(ENDPOINTS.HEALTH, { skipAuth: true });
-

@@ -27,5 +27,4 @@ export const ENDPOINTS = {
   LEADERBOARD: '/leaderboard',
   CONTACTS: '/contacts',
   ALERTS: '/alerts',
-  DASHBOARD: '/dashboard',
 };

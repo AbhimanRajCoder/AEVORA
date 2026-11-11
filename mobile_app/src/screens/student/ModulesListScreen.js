@@ -113,6 +113,7 @@ export const ModulesListScreen = ({ navigation }) => {
                 title: item.title,
               })
             }
+            style={({ pressed }) => [pressed && styles.pressed]}
           >
             <Card variant="light">
               <View style={styles.topRow}>
@@ -182,6 +183,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   list: { flex: 1, backgroundColor: COLORS.pureWhite },
+  pressed: { opacity: 0.85 },
   container: { padding: SPACING.s24, paddingBottom: 112, flexGrow: 1 },
   topRow: {
     flexDirection: 'row',

@@ -1,15 +1,19 @@
-// Signature pressed-seed floating pill bottom navigation bar per mobile_app/design.md.
+// Signature pressed-seed floating pill bottom navigation bar with geometric tab icons.
 
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { TabIcon } from './TabIcon';
 import { COLORS, ELEVATION, RADIUS, SPACING } from '../constants/theme';
 
 export const FloatingPillTabBar = ({ state, descriptors, navigation }) => {
   const insets = useSafeAreaInsets();
 
   return (
-    <View style={[styles.wrapper, { paddingBottom: Math.max(insets.bottom, SPACING.s16) }]}>
+    <View
+      pointerEvents="box-none"
+      style={[styles.wrapper, { paddingBottom: Math.max(insets.bottom, SPACING.s12) }]}
+    >
       <View style={[styles.pillBar, ELEVATION.floatingNav]}>
         {state.routes.map((route, index) => {
           const { options } = descriptors[route.key];
@@ -31,10 +35,15 @@ export const FloatingPillTabBar = ({ state, descriptors, navigation }) => {
             <Pressable
               key={route.key}
               onPress={onPress}
-              style={[styles.tabItem, isFocused && styles.tabItemActive]}
+              style={({ pressed }) => [
+                styles.tabItem,
+                isFocused && styles.tabItemActive,
+                pressed && !isFocused && styles.tabItemPressed,
+              ]}
               accessibilityRole="button"
               accessibilityState={isFocused ? { selected: true } : {}}
             >
+              <TabIcon name={route.name} active={isFocused} />
               <Text
                 numberOfLines={1}
                 style={[styles.tabLabel, isFocused ? styles.tabLabelActive : styles.tabLabelIdle]}
@@ -72,15 +81,18 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: SPACING.s8,
+    paddingVertical: 8,
+    paddingHorizontal: 4,
     borderRadius: RADIUS.nav,
   },
   tabItemActive: {
     backgroundColor: COLORS.electricSprout,
   },
+  tabItemPressed: {
+    opacity: 0.75,
+  },
   tabLabel: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '500',
     letterSpacing: -0.1,
   },
@@ -92,4 +104,3 @@ const styles = StyleSheet.create({
     color: COLORS.paleFern,
   },
 });
-
