@@ -15,6 +15,9 @@ backend/.env.*
 client/.env
 client/.env.*
 !client/.env.example
+mobile_app/.env
+mobile_app/.env.*
+!mobile_app/.env.example
 !.env.example
 
 # Build and distribution outputs
@@ -51,3 +54,4 @@ Thumbs.db
 PRD.MD
 CHECKLIST.MD
 RULES.MD
+MOBILE_CHECKLIST.MD

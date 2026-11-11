@@ -16,6 +16,8 @@ import leaderboardRoute from './routes/leaderboardRoute.js';
 import contactRoute from './routes/contactRoute.js';
 import alertRoute from './routes/alertRoute.js';
 import dashboardRoute from './routes/dashboardRoute.js';
+import authRoute from './routes/authRoute.js';
+import institutionRoute from './routes/institutionRoute.js';
 
 // Load environment variables from .env file
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -63,6 +65,8 @@ app.get('/api/v1/health', (_req, res) => {
 });
 
 // API routes under /api/v1
+app.use('/api/v1/auth', authRoute);
+app.use('/api/v1/institutions', institutionRoute);
 app.use('/api/v1/modules', moduleRoute);
 app.use('/api/v1/lessons', lessonRoute);
 app.use('/api/v1/quizzes', quizRoute);

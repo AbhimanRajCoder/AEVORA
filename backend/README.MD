@@ -12,14 +12,15 @@ Detailed REST API documentation for the AEVORA backend (`Node.js` + `Express 5` 
 4. [Endpoint Summary](#endpoint-summary)
 5. [Detailed Route Reference](#detailed-route-reference)
    - [Health Checks](#1-health-checks)
-   - [Learning Modules](#2-learning-modules)
-   - [Lessons](#3-lessons)
-   - [Quizzes](#4-quizzes)
-   - [Virtual Drills](#5-virtual-drills)
-   - [Leaderboard](#6-leaderboard)
-   - [Emergency Contacts](#7-emergency-contacts)
-   - [Campus Alerts](#8-campus-alerts)
-   - [Admin Dashboard](#9-admin-dashboard)
+   - [Authentication & Institutions](#2-authentication--institutions)
+   - [Learning Modules](#3-learning-modules)
+   - [Lessons](#4-lessons)
+   - [Quizzes](#5-quizzes)
+   - [Virtual Drills](#6-virtual-drills)
+   - [Leaderboard](#7-leaderboard)
+   - [Emergency Contacts](#8-emergency-contacts)
+   - [Campus Alerts](#9-campus-alerts)
+   - [Admin Dashboard](#10-admin-dashboard)
 
 ---
 
@@ -34,6 +35,7 @@ Detailed REST API documentation for the AEVORA backend (`Node.js` + `Express 5` 
 | :--- | :--- | :--- | :--- |
 | `PORT` | No | `5000` | HTTP port the Express server listens on |
 | `SUPABASE_URL` | **Yes** | — | Your Supabase project URL |
+| `SUPABASE_ANON_KEY` | Recommended | — | Supabase public anon key (used by backend auth proxy for login/refresh; falls back to service role key) |
 | `SUPABASE_SERVICE_ROLE_KEY` | **Yes** | — | Supabase Service Role key (used for auth verification & admin queries) |
 | `CORS_ORIGIN` | No | `http://localhost:3000,http://localhost:5173` | Comma-separated list of allowed browser origins |
 
@@ -52,7 +54,7 @@ npm test        # runs automated test suite (tests/*.test.js)
 
 ## Authentication & Authorization (RBAC)
 
-All `/api/v1/*` routes (except `/api/v1/health`) require a valid **Supabase Auth JWT** passed in the `Authorization` header:
+All protected `/api/v1/*` routes require a valid **Supabase Auth JWT** returned by `/api/v1/auth/login` or `/api/v1/auth/signup`, passed in the `Authorization` header:
 
 ```http
 Authorization: Bearer <supabase_access_token>
@@ -113,6 +115,12 @@ Every endpoint returns a consistent JSON envelope defined in `utils/responseHelp
 | :--- | :--- | :--- | :--- | :--- |
 | `GET` | `/` | Public | Any | Root service health check |
 | `GET` | `/api/v1/health` | Public | Any | API v1 health check |
+| `POST` | `/api/v1/auth/signup` | Public | Any | Register a new account and return tokens + profile |
+| `POST` | `/api/v1/auth/login` | Public | Any | Sign in with email & password and return tokens + profile |
+| `POST` | `/api/v1/auth/refresh` | Public | Any | Refresh an expired access token |
+| `POST` | `/api/v1/auth/logout` | Public | Any | Close current session |
+| `GET` | `/api/v1/auth/me` | Bearer | Any | Get authenticated user's profile |
+| `GET` | `/api/v1/institutions` | Public | Any | List available institutions for signup |
 | `GET` | `/api/v1/modules` | Bearer | Any | List all learning modules with user progress |
 | `GET` | `/api/v1/modules/:id` | Bearer | Any | Get a single module and its lessons with completion status |
 | `POST` | `/api/v1/lessons/:id/complete` | Bearer | Any | Mark a lesson as completed for the current user |
@@ -173,7 +181,177 @@ API v1 health check endpoint.
 
 ---
 
-### 2. Learning Modules
+### 2. Authentication & Institutions
+
+#### `POST /api/v1/auth/signup`
+Registers a new user via Supabase Auth on the backend, initializes their `profiles` row, and returns session tokens + profile.
+
+- **Auth:** None (Public)
+- **Request Body (`application/json`):**
+  - `full_name` (`string`, **required**, non-empty)
+  - `email` (`string`, **required**, valid email)
+  - `password` (`string`, **required**, minimum 6 characters)
+  - `institution_id` (`string`, optional, valid UUID; defaults to the first registered institution if omitted)
+  - `role` (`string`, optional, default `"student"`; allowed: `"student" | "admin"`)
+```json
+{
+  "full_name": "Aarav Sharma",
+  "email": "aarav@apex.edu",
+  "password": "password123",
+  "institution_id": "11111111-1111-1111-1111-111111111111",
+  "role": "student"
+}
+```
+- **Response (`201 Created`):**
+```json
+{
+  "success": true,
+  "data": {
+    "access_token": "eyJhbGciOiJIUzI1NiIs...",
+    "refresh_token": "v1.MR...",
+    "expires_at": 1794385000,
+    "user": {
+      "id": "10000000-0000-0000-0000-000000000001",
+      "email": "aarav@apex.edu",
+      "full_name": "Aarav Sharma",
+      "role": "student",
+      "institution_id": "11111111-1111-1111-1111-111111111111",
+      "points": 0
+    }
+  },
+  "error": null
+}
+```
+- **Error Responses:**
+  - `400`: Validation error (missing name, invalid email, password < 6 chars, invalid UUID/role)
+  - `404`: `"Selected institution not found"`
+  - `409`: `"An account with this email already exists"`
+
+#### `POST /api/v1/auth/login`
+Authenticates an existing user with email and password and returns session tokens + profile.
+
+- **Auth:** None (Public)
+- **Request Body (`application/json`):**
+  - `email` (`string`, **required**, valid email)
+  - `password` (`string`, **required**)
+```json
+{
+  "email": "aarav@apex.edu",
+  "password": "password123"
+}
+```
+- **Response (`200 OK`):**
+```json
+{
+  "success": true,
+  "data": {
+    "access_token": "eyJhbGciOiJIUzI1NiIs...",
+    "refresh_token": "v1.MR...",
+    "expires_at": 1794385000,
+    "user": {
+      "id": "10000000-0000-0000-0000-000000000001",
+      "email": "aarav@apex.edu",
+      "full_name": "Aarav Sharma",
+      "role": "student",
+      "institution_id": "11111111-1111-1111-1111-111111111111",
+      "points": 100
+    }
+  },
+  "error": null
+}
+```
+- **Error Responses:**
+  - `400`: `"A valid email address is required"` / `"Password is required"`
+  - `401`: `"Invalid email or password"` / `"User profile not found"`
+
+#### `POST /api/v1/auth/refresh`
+Exchanges a valid `refresh_token` for a new `access_token` and `refresh_token`.
+
+- **Auth:** None (Public)
+- **Request Body (`application/json`):**
+  - `refresh_token` (`string`, **required**)
+```json
+{
+  "refresh_token": "v1.MR..."
+}
+```
+- **Response (`200 OK`):**
+```json
+{
+  "success": true,
+  "data": {
+    "access_token": "eyJhbGciOiJIUzI1NiIs...",
+    "refresh_token": "v1.MR...",
+    "expires_at": 1794388600
+  },
+  "error": null
+}
+```
+- **Error Responses:**
+  - `400`: `"refresh_token is required"`
+  - `401`: `"Invalid or expired refresh token"`
+
+#### `POST /api/v1/auth/logout`
+Closes the user's session on the server (optional `Authorization: Bearer <token>` header).
+
+- **Auth:** Public (Optional Bearer token)
+- **Request:** No body required.
+- **Response (`200 OK`):**
+```json
+{
+  "success": true,
+  "data": {
+    "message": "Logged out successfully"
+  },
+  "error": null
+}
+```
+
+#### `GET /api/v1/auth/me`
+Returns the authenticated user's profile attached by `requireAuth`.
+
+- **Auth:** `Bearer <token>` (Student or Admin)
+- **Request:** No params, query, or body.
+- **Response (`200 OK`):**
+```json
+{
+  "success": true,
+  "data": {
+    "id": "10000000-0000-0000-0000-000000000001",
+    "email": "aarav@apex.edu",
+    "role": "student",
+    "institution_id": "11111111-1111-1111-1111-111111111111",
+    "full_name": "Aarav Sharma",
+    "points": 100
+  },
+  "error": null
+}
+```
+
+#### `GET /api/v1/institutions`
+Returns all registered institutions ordered by `name` ascending (used for the mobile/web signup institution picker).
+
+- **Auth:** None (Public)
+- **Request:** No params, query, or body.
+- **Response (`200 OK`):**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "11111111-1111-1111-1111-111111111111",
+      "name": "Apex Institute of Technology",
+      "state": "Maharashtra",
+      "district": "Pune"
+    }
+  ],
+  "error": null
+}
+```
+
+---
+
+### 3. Learning Modules
 
 #### `GET /api/v1/modules`
 Retrieves all disaster learning modules ordered by `created_at` ascending, enriched with the authenticated user's lesson completion stats.
@@ -242,7 +420,7 @@ Retrieves a single learning module along with its ordered lessons and per-lesson
 
 ---
 
-### 3. Lessons
+### 4. Lessons
 
 #### `POST /api/v1/lessons/:id/complete`
 Marks a lesson as completed for the authenticated user (idempotent upsert on `(user_id, lesson_id)` in `lesson_progress`).
@@ -270,7 +448,7 @@ Marks a lesson as completed for the authenticated user (idempotent upsert on `(u
 
 ---
 
-### 4. Quizzes
+### 5. Quizzes
 
 #### `GET /api/v1/quizzes/:moduleId`
 Retrieves all quiz questions for a given learning module. Correct answers are **stripped** before sending to the client.
@@ -379,7 +557,7 @@ Grades submitted quiz answers server-side (case-insensitive, trimmed string comp
 
 ---
 
-### 5. Virtual Drills
+### 6. Virtual Drills
 
 #### `GET /api/v1/drills`
 Lists all virtual drill scenarios ordered by `created_at` ascending. Step option `points` and `feedback` are **stripped** so students cannot see scoring before submitting.
@@ -518,7 +696,7 @@ Evaluates student choices for each step of a virtual drill, calculates percentag
 
 ---
 
-### 6. Leaderboard
+### 7. Leaderboard
 
 #### `GET /api/v1/leaderboard`
 Returns student rankings (`role = 'student'`) within the authenticated user's `institution_id`, sorted by `points` descending, along with the current user's standing.
@@ -575,7 +753,7 @@ Returns student rankings (`role = 'student'`) within the authenticated user's `i
 
 ---
 
-### 7. Emergency Contacts
+### 8. Emergency Contacts
 
 #### `GET /api/v1/contacts`
 Retrieves national emergency contacts (`institution_id IS NULL`) plus local emergency contacts matching the authenticated user's `institution_id`, ordered by `created_at` ascending.
@@ -662,7 +840,7 @@ Creates a new local emergency contact scoped to the authenticated admin's `insti
 
 ---
 
-### 8. Campus Alerts
+### 9. Campus Alerts
 
 #### `GET /api/v1/alerts`
 Retrieves all campus alerts for the authenticated user's `institution_id`, ordered newest first (`created_at` descending). Returns `[]` if the user has no `institution_id`.
@@ -726,7 +904,7 @@ Publishes a new campus alert scoped to the authenticated admin's `institution_id
 
 ---
 
-### 9. Admin Dashboard
+### 10. Admin Dashboard
 
 #### `GET /api/v1/dashboard`
 Computes institutional preparedness analytics across all `student` profiles belonging to the authenticated admin's `institution_id`.
