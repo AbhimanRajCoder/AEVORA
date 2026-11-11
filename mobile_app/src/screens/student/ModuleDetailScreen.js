@@ -1,16 +1,19 @@
-// Module detail screen fetching GET /api/v1/modules/:id and displaying ordered lessons.
+// Module detail screen showing header, progress, interactive lessons list, and Take Module Quiz CTA.
 
-import React, { useCallback, useEffect, useState } from 'react';
-import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { getModuleById } from '../../services/moduleService';
+import { AtmosphericOrb } from '../../components/AtmosphericOrb';
 import { Card } from '../../components/Card';
 import { ProgressBar } from '../../components/ProgressBar';
+import { PrimaryButton } from '../../components/PrimaryButton';
 import { LoadingState } from '../../components/LoadingState';
 import { ErrorState } from '../../components/ErrorState';
 import { EmptyState } from '../../components/EmptyState';
 import { COLORS, FONTS, RADIUS, SPACING, TYPE } from '../../constants/theme';
 
-export const ModuleDetailScreen = ({ route }) => {
+export const ModuleDetailScreen = ({ route, navigation }) => {
   const { moduleId } = route.params;
   const [moduleData, setModuleData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -35,11 +38,13 @@ export const ModuleDetailScreen = ({ route }) => {
     [moduleId]
   );
 
-  useEffect(() => {
-    loadModule();
-  }, [loadModule]);
+  useFocusEffect(
+    useCallback(() => {
+      loadModule();
+    }, [loadModule])
+  );
 
-  if (isLoading) return <LoadingState message="Loading module details..." />;
+  if (isLoading) return <LoadingState dark message="Loading module details..." />;
   if (error) return <ErrorState message={error} onRetry={() => loadModule()} />;
 
   const lessons = moduleData?.lessons || [];
@@ -52,50 +57,89 @@ export const ModuleDetailScreen = ({ route }) => {
         <RefreshControl refreshing={isRefreshing} onRefresh={() => loadModule(true)} />
       }
     >
-      <Card variant="dark">
+      {/* Band 1: Forest Depths Module Overview */}
+      <View style={styles.darkStage}>
+        <AtmosphericOrb style={styles.orb} />
         <View style={styles.typePill}>
           <Text style={styles.typeText}>{moduleData?.disaster_type?.toUpperCase()}</Text>
         </View>
         <Text style={styles.title}>{moduleData?.title}</Text>
         <Text style={styles.desc}>{moduleData?.description}</Text>
-        <ProgressBar dark percentage={moduleData?.progress_percentage ?? 0} />
-        <Text style={styles.progressText}>
-          {moduleData?.completed_lessons ?? 0} of {moduleData?.total_lessons ?? 0} lessons completed (
-          {moduleData?.progress_percentage ?? 0}%)
+
+        <View style={styles.progressBlock}>
+          <ProgressBar dark percentage={moduleData?.progress_percentage ?? 0} />
+          <Text style={styles.progressText}>
+            {moduleData?.completed_lessons ?? 0} of {moduleData?.total_lessons ?? 0} lessons completed (
+            {moduleData?.progress_percentage ?? 0}%)
+          </Text>
+        </View>
+
+        <PrimaryButton
+          label="Take Module Quiz"
+          onPress={() =>
+            navigation.navigate('Quiz', {
+              moduleId,
+              moduleTitle: moduleData?.title,
+            })
+          }
+        />
+      </View>
+
+      {/* Band 2: Pure White Ordered Lessons List */}
+      <View style={styles.lightBand}>
+        <Text style={styles.sectionHeading}>
+          Module <Text style={styles.accent}>Lessons</Text>
         </Text>
-      </Card>
 
-      <Text style={styles.sectionHeading}>
-        Module <Text style={styles.accent}>Lessons</Text>
-      </Text>
-
-      {lessons.length === 0 ? (
-        <EmptyState title="No lessons in this module yet" />
-      ) : (
-        lessons.map((lesson, index) => (
-          <Card key={lesson.id} variant="light">
-            <View style={styles.lessonTop}>
-              <Text style={styles.serifIndex}>Lesson 0{index + 1}</Text>
-              <View style={[styles.statusChip, lesson.is_completed && styles.statusChipDone]}>
-                <Text style={[styles.statusText, lesson.is_completed && styles.statusTextDone]}>
-                  {lesson.is_completed ? 'COMPLETED' : 'PENDING'}
+        {lessons.length === 0 ? (
+          <EmptyState title="No lessons in this module yet" />
+        ) : (
+          lessons.map((lesson, index) => (
+            <Pressable
+              key={lesson.id}
+              onPress={() =>
+                navigation.navigate('LessonReader', {
+                  lesson,
+                  lessons,
+                  lessonIndex: index,
+                  moduleId,
+                  moduleTitle: moduleData?.title,
+                })
+              }
+            >
+              <Card variant="light">
+                <View style={styles.lessonTop}>
+                  <Text style={styles.serifIndex}>Lesson 0{index + 1}</Text>
+                  <View style={[styles.statusChip, lesson.is_completed && styles.statusChipDone]}>
+                    <Text style={[styles.statusText, lesson.is_completed && styles.statusTextDone]}>
+                      {lesson.is_completed ? '✓ COMPLETED' : 'READ'}
+                    </Text>
+                  </View>
+                </View>
+                <Text style={styles.lessonTitle}>{lesson.title}</Text>
+                <Text style={styles.lessonPreview} numberOfLines={2}>
+                  {lesson.content}
                 </Text>
-              </View>
-            </View>
-            <Text style={styles.lessonTitle}>{lesson.title}</Text>
-            <Text style={styles.lessonPreview} numberOfLines={3}>
-              {lesson.content}
-            </Text>
-          </Card>
-        ))
-      )}
+              </Card>
+            </Pressable>
+          ))
+        )}
+      </View>
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: COLORS.pureWhite },
-  container: { padding: SPACING.s24, paddingBottom: SPACING.s48 },
+  container: { paddingBottom: SPACING.s48 },
+  darkStage: {
+    backgroundColor: COLORS.forestDepths,
+    paddingHorizontal: SPACING.s24,
+    paddingTop: SPACING.s16,
+    paddingBottom: SPACING.s32,
+    overflow: 'hidden',
+  },
+  orb: { top: -110, right: -110 },
   typePill: {
     backgroundColor: COLORS.electricSprout,
     borderRadius: RADIUS.badge,
@@ -107,11 +151,16 @@ const styles = StyleSheet.create({
   typeText: { fontSize: 11, fontWeight: '600', color: COLORS.carbon },
   title: { ...TYPE.heading, color: COLORS.pureWhite, marginBottom: SPACING.s8 },
   desc: { ...TYPE.body, color: COLORS.paleFern, marginBottom: SPACING.s24 },
+  progressBlock: { marginBottom: SPACING.s24 },
   progressText: { ...TYPE.caption, color: COLORS.paleFern, marginTop: SPACING.s8 },
+  lightBand: {
+    backgroundColor: COLORS.pureWhite,
+    paddingHorizontal: SPACING.s24,
+    paddingTop: SPACING.s24,
+  },
   sectionHeading: {
     ...TYPE.heading,
     color: COLORS.onyxOlive,
-    marginTop: SPACING.s8,
     marginBottom: SPACING.s16,
   },
   accent: { color: COLORS.deepVerdant },
@@ -140,8 +189,7 @@ const styles = StyleSheet.create({
     borderColor: COLORS.mistGreen,
   },
   statusText: { fontSize: 11, fontWeight: '500', color: COLORS.lichenSage },
-  statusTextDone: { color: COLORS.mossShadow },
+  statusTextDone: { color: COLORS.mossShadow, fontWeight: '600' },
   lessonTitle: { ...TYPE.headingSm, color: COLORS.onyxOlive, marginBottom: SPACING.s8 },
   lessonPreview: { ...TYPE.body, color: COLORS.lichenSage },
 });
-

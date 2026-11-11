@@ -7,6 +7,8 @@ import { FloatingPillTabBar } from '../components/FloatingPillTabBar';
 import { StudentHomeScreen } from '../screens/student/StudentHomeScreen';
 import { ModulesListScreen } from '../screens/student/ModulesListScreen';
 import { ModuleDetailScreen } from '../screens/student/ModuleDetailScreen';
+import { LessonReaderScreen } from '../screens/student/LessonReaderScreen';
+import { QuizScreen } from '../screens/student/QuizScreen';
 import { DrillsListScreen } from '../screens/student/DrillsListScreen';
 import { LeaderboardScreen } from '../screens/student/LeaderboardScreen';
 import { AlertsScreen } from '../screens/shared/AlertsScreen';
@@ -68,6 +70,16 @@ export const StudentNavigator = () => (
       name="ModuleDetail"
       component={ModuleDetailScreen}
       options={({ route }) => ({ title: route.params?.title || 'Module Details' })}
+    />
+    <Stack.Screen
+      name="LessonReader"
+      component={LessonReaderScreen}
+      options={({ route }) => ({ title: route.params?.lesson?.title || 'Lesson' })}
+    />
+    <Stack.Screen
+      name="Quiz"
+      component={QuizScreen}
+      options={({ route }) => ({ title: route.params?.moduleTitle ? `${route.params.moduleTitle} Quiz` : 'Module Quiz' })}
     />
     <Stack.Screen
       name="Leaderboard"
