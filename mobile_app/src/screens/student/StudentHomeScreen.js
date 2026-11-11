@@ -1,18 +1,21 @@
-// Student Home dashboard displaying points, latest campus alert, and quick navigation.
+// Student Home with alternating Forest Depths dark hero and Pure White / Bone White cards.
 
 import React, { useCallback, useEffect, useState } from 'react';
 import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../context/AuthContext';
 import { getModules } from '../../services/moduleService';
 import { getAlerts } from '../../services/alertService';
+import { AtmosphericOrb } from '../../components/AtmosphericOrb';
 import { Card } from '../../components/Card';
 import { ProgressBar } from '../../components/ProgressBar';
 import { SeverityBadge } from '../../components/SeverityBadge';
 import { LoadingState } from '../../components/LoadingState';
 import { ErrorState } from '../../components/ErrorState';
-import { COLORS, RADIUS, SPACING } from '../../constants/theme';
+import { COLORS, FONTS, RADIUS, SPACING, TYPE } from '../../constants/theme';
 
 export const StudentHomeScreen = ({ navigation }) => {
+  const insets = useSafeAreaInsets();
   const { user } = useAuth();
   const [modules, setModules] = useState([]);
   const [latestAlert, setLatestAlert] = useState(null);
@@ -40,7 +43,7 @@ export const StudentHomeScreen = ({ navigation }) => {
     loadHomeData();
   }, [loadHomeData]);
 
-  if (isLoading) return <LoadingState message="Loading dashboard..." />;
+  if (isLoading) return <LoadingState dark message="Loading workspace..." />;
   if (error) return <ErrorState message={error} onRetry={() => loadHomeData()} />;
 
   const completedModules = modules.filter((m) => m.is_completed).length;
@@ -53,93 +56,267 @@ export const StudentHomeScreen = ({ navigation }) => {
 
   return (
     <ScrollView
-      style={styles.screen}
-      contentContainerStyle={styles.container}
+      style={styles.page}
+      contentContainerStyle={styles.scrollContent}
       refreshControl={
         <RefreshControl refreshing={isRefreshing} onRefresh={() => loadHomeData(true)} />
       }
     >
-      <Card style={styles.heroCard}>
-        <View style={styles.heroTop}>
-          <Text style={styles.greeting}>Hello, {user?.full_name || 'Student'}</Text>
-          <Pressable onPress={() => navigation.navigate('Profile')} style={styles.profilePill}>
-            <Text style={styles.profilePillText}>Profile</Text>
+      {/* Band 1: Forest Depths Dark Stage */}
+      <View style={[styles.darkStage, { paddingTop: insets.top + SPACING.s24 }]}>
+        <AtmosphericOrb style={styles.orb} />
+
+        <View style={styles.topBar}>
+          <View style={styles.brandRow}>
+            <Text style={styles.brandWordmark}>aevora</Text>
+            <View style={styles.pointsTag}>
+              <Text style={styles.pointsTagText}>{user?.points ?? 0} PTS</Text>
+            </View>
+          </View>
+          <Pressable
+            onPress={() => navigation.navigate('Profile')}
+            style={styles.profileButton}
+          >
+            <Text style={styles.profileButtonText}>Profile</Text>
           </Pressable>
         </View>
-        <Text style={styles.points}>Total Points: {user?.points ?? 0} pts</Text>
-        <ProgressBar percentage={overallProgress} />
-        <Text style={styles.progressText}>
-          {completedModules} of {modules.length} modules completed ({overallProgress}%)
+
+        <Text style={styles.heroHeadline}>
+          Stay{'\n'}
+          safe <Text style={styles.sproutAccent}>all</Text>{'\n'}
+          semester.
         </Text>
-      </Card>
+        <Text style={styles.heroSubcopy}>
+          Welcome back, {user?.full_name || 'Student'}. Track modules and practice drills.
+        </Text>
 
-      {latestAlert ? (
-        <Pressable onPress={() => navigation.navigate('Alerts')}>
-          <Card>
-            <View style={styles.alertTop}>
-              <SeverityBadge severity={latestAlert.severity} />
-              <Text style={styles.linkText}>View All</Text>
+        {/* Floating Tilted Progress Showcase Card */}
+        <Card variant="floating" style={styles.floatingCard}>
+          <View style={styles.floatingTop}>
+            <View style={styles.sproutChip}>
+              <Text style={styles.sproutChipText}>Readiness</Text>
             </View>
-            <Text style={styles.cardTitle}>{latestAlert.title}</Text>
-            <Text style={styles.cardBody} numberOfLines={2}>
-              {latestAlert.message}
-            </Text>
-          </Card>
-        </Pressable>
-      ) : null}
+            <Text style={styles.serifNote}>progress</Text>
+          </View>
+          <Text style={styles.floatingPercent}>{overallProgress}%</Text>
+          <ProgressBar percentage={overallProgress} />
+          <Text style={styles.floatingCaption}>
+            {completedModules} of {modules.length} learning modules completed
+          </Text>
+        </Card>
+      </View>
 
-      <View style={styles.quickGrid}>
-        <Pressable style={styles.quickBtn} onPress={() => navigation.navigate('Modules')}>
-          <Text style={styles.quickTitle}>Modules</Text>
-          <Text style={styles.quickSub}>Safety lessons</Text>
-        </Pressable>
-        <Pressable style={styles.quickBtn} onPress={() => navigation.navigate('Drills')}>
-          <Text style={styles.quickTitle}>Drills</Text>
-          <Text style={styles.quickSub}>Practice scenarios</Text>
-        </Pressable>
-        <Pressable style={styles.quickBtn} onPress={() => navigation.navigate('Leaderboard')}>
-          <Text style={styles.quickTitle}>Leaderboard</Text>
-          <Text style={styles.quickSub}>Campus rankings</Text>
-        </Pressable>
-        <Pressable style={styles.quickBtn} onPress={() => navigation.navigate('Emergency')}>
-          <Text style={styles.quickTitle}>SOS Contacts</Text>
-          <Text style={styles.quickSub}>112 & campus</Text>
-        </Pressable>
+      {/* Band 2: Pure White Light Bed with Bone White Cards */}
+      <View style={styles.lightBand}>
+        {latestAlert ? (
+          <Pressable onPress={() => navigation.navigate('Alerts')}>
+            <Card variant="light">
+              <View style={styles.alertRow}>
+                <SeverityBadge severity={latestAlert.severity} />
+                <Text style={styles.viewAllLink}>View all alerts</Text>
+              </View>
+              <Text style={styles.cardTitle}>{latestAlert.title}</Text>
+              <Text style={styles.cardBody} numberOfLines={2}>
+                {latestAlert.message}
+              </Text>
+            </Card>
+          </Pressable>
+        ) : null}
+
+        <Text style={styles.sectionHeading}>
+          Quick <Text style={styles.deepVerdantAccent}>actions</Text>
+        </Text>
+
+        <View style={styles.grid}>
+          <Pressable style={styles.gridCard} onPress={() => navigation.navigate('Modules')}>
+            <View style={styles.sproutChip}>
+              <Text style={styles.sproutChipText}>01 · Learn</Text>
+            </View>
+            <Text style={styles.gridTitle}>Modules</Text>
+            <Text style={styles.gridSub}>Earthquake, flood & fire</Text>
+          </Pressable>
+
+          <Pressable style={styles.gridCard} onPress={() => navigation.navigate('Drills')}>
+            <View style={styles.sproutChip}>
+              <Text style={styles.sproutChipText}>02 · Practice</Text>
+            </View>
+            <Text style={styles.gridTitle}>Virtual Drills</Text>
+            <Text style={styles.gridSub}>Interactive scenarios</Text>
+          </Pressable>
+
+          <Pressable style={styles.gridCard} onPress={() => navigation.navigate('Leaderboard')}>
+            <View style={styles.sproutChip}>
+              <Text style={styles.sproutChipText}>03 · Rank</Text>
+            </View>
+            <Text style={styles.gridTitle}>Leaderboard</Text>
+            <Text style={styles.gridSub}>Campus standings</Text>
+          </Pressable>
+
+          <Pressable style={styles.gridCard} onPress={() => navigation.navigate('Emergency')}>
+            <View style={styles.sproutChip}>
+              <Text style={styles.sproutChipText}>04 · SOS</Text>
+            </View>
+            <Text style={styles.gridTitle}>Helplines</Text>
+            <Text style={styles.gridSub}>112 & campus desk</Text>
+          </Pressable>
+        </View>
       </View>
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: COLORS.background },
-  container: { padding: SPACING.md },
-  heroCard: { backgroundColor: COLORS.primaryLight, borderColor: COLORS.primary },
-  heroTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  profilePill: {
-    backgroundColor: COLORS.surface,
-    paddingHorizontal: SPACING.sm,
-    paddingVertical: 4,
-    borderRadius: RADIUS.full,
-    borderWidth: 1,
-    borderColor: COLORS.primary,
+  page: { flex: 1, backgroundColor: COLORS.pureWhite },
+  scrollContent: { paddingBottom: 112 },
+  darkStage: {
+    backgroundColor: COLORS.forestDepths,
+    paddingHorizontal: SPACING.s24,
+    paddingBottom: SPACING.s40,
+    overflow: 'hidden',
   },
-  profilePillText: { fontSize: 12, fontWeight: '700', color: COLORS.primary },
-  greeting: { fontSize: 20, fontWeight: '800', color: COLORS.text, flex: 1 },
-  points: { fontSize: 14, fontWeight: '700', color: COLORS.primary, marginVertical: SPACING.xs },
-  progressText: { fontSize: 12, color: COLORS.textMuted, marginTop: SPACING.xs },
-  alertTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: SPACING.xs },
-  linkText: { fontSize: 12, fontWeight: '700', color: COLORS.primary },
-  cardTitle: { fontSize: 15, fontWeight: '700', color: COLORS.text },
-  cardBody: { fontSize: 13, color: COLORS.textMuted, marginTop: 2 },
-  quickGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm },
-  quickBtn: {
+  orb: { top: -80, right: -100 },
+  topBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: SPACING.s32,
+  },
+  brandRow: { flexDirection: 'row', alignItems: 'center', gap: SPACING.s8 },
+  brandWordmark: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: COLORS.pureWhite,
+    letterSpacing: -0.5,
+  },
+  pointsTag: {
+    backgroundColor: COLORS.electricSprout,
+    borderRadius: RADIUS.badge,
+    paddingVertical: SPACING.badgeV,
+    paddingHorizontal: 12,
+  },
+  pointsTagText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: COLORS.onyxOlive,
+  },
+  profileButton: {
+    borderWidth: 1,
+    borderColor: COLORS.pureWhite,
+    borderRadius: RADIUS.pill,
+    paddingVertical: 6,
+    paddingHorizontal: SPACING.s16,
+  },
+  profileButtonText: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: COLORS.pureWhite,
+  },
+  heroHeadline: {
+    fontFamily: FONTS.display,
+    ...TYPE.displayHero,
+    color: COLORS.pureWhite,
+    marginBottom: SPACING.s16,
+  },
+  sproutAccent: { color: COLORS.electricSprout },
+  heroSubcopy: {
+    ...TYPE.bodyMd,
+    color: COLORS.paleFern,
+    marginBottom: SPACING.s24,
+  },
+  floatingCard: {
+    transform: [{ rotate: '-1.5deg' }],
+    marginBottom: 0,
+  },
+  floatingTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: SPACING.s8,
+  },
+  sproutChip: {
+    backgroundColor: COLORS.sproutWash,
+    borderRadius: RADIUS.badge,
+    paddingVertical: SPACING.badgeV,
+    paddingHorizontal: 12,
+    alignSelf: 'flex-start',
+  },
+  sproutChipText: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: COLORS.mossShadow,
+  },
+  serifNote: {
+    fontFamily: FONTS.serif,
+    fontSize: 16,
+    fontStyle: 'italic',
+    color: COLORS.lichenSage,
+  },
+  floatingPercent: {
+    ...TYPE.headingLg,
+    color: COLORS.onyxOlive,
+    marginBottom: SPACING.s8,
+  },
+  floatingCaption: {
+    ...TYPE.caption,
+    color: COLORS.lichenSage,
+    marginTop: SPACING.s8,
+  },
+  lightBand: {
+    backgroundColor: COLORS.pureWhite,
+    paddingHorizontal: SPACING.s24,
+    paddingTop: SPACING.s32,
+  },
+  alertRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: SPACING.s8,
+  },
+  viewAllLink: {
+    ...TYPE.caption,
+    color: COLORS.carbon,
+    textDecorationLine: 'underline',
+    fontWeight: '500',
+  },
+  cardTitle: {
+    ...TYPE.headingSm,
+    color: COLORS.onyxOlive,
+    marginBottom: SPACING.s8,
+  },
+  cardBody: {
+    ...TYPE.body,
+    color: COLORS.lichenSage,
+  },
+  sectionHeading: {
+    ...TYPE.heading,
+    color: COLORS.onyxOlive,
+    marginTop: SPACING.s8,
+    marginBottom: SPACING.s16,
+  },
+  deepVerdantAccent: { color: COLORS.deepVerdant },
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  gridCard: {
     width: '48%',
-    backgroundColor: COLORS.surface,
-    borderRadius: RADIUS.md,
-    padding: SPACING.md,
+    backgroundColor: COLORS.boneWhite,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.mistGreen,
+    borderRadius: RADIUS.card,
+    padding: SPACING.s16,
+    marginBottom: SPACING.s16,
   },
-  quickTitle: { fontSize: 15, fontWeight: '700', color: COLORS.text },
-  quickSub: { fontSize: 12, color: COLORS.textMuted, marginTop: 2 },
+  gridTitle: {
+    ...TYPE.subheading,
+    fontWeight: '600',
+    color: COLORS.onyxOlive,
+    marginTop: SPACING.s16,
+    marginBottom: 4,
+  },
+  gridSub: {
+    ...TYPE.caption,
+    color: COLORS.lichenSage,
+  },
 });

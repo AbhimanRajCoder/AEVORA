@@ -1,13 +1,18 @@
-// Full-screen or inline loading spinner component.
+// Loading state rendered in Forest Depths or Pure White canvas.
 
 import React from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
-import { COLORS, SPACING } from '../constants/theme';
+import { COLORS, SPACING, TYPE } from '../constants/theme';
 
-export const LoadingState = ({ message = 'Loading...' }) => (
-  <View style={styles.container}>
-    <ActivityIndicator size="large" color={COLORS.primary} />
-    <Text style={styles.text}>{message}</Text>
+export const LoadingState = ({ message = 'Loading...', dark = false }) => (
+  <View style={[styles.container, dark ? styles.bgDark : styles.bgLight]}>
+    <ActivityIndicator
+      size="large"
+      color={dark ? COLORS.electricSprout : COLORS.deepVerdant}
+    />
+    <Text style={[styles.text, dark ? styles.textDark : styles.textLight]}>
+      {message}
+    </Text>
   </View>
 );
 
@@ -16,13 +21,14 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: SPACING.lg,
-    backgroundColor: COLORS.background,
+    padding: SPACING.s24,
   },
+  bgLight: { backgroundColor: COLORS.pureWhite },
+  bgDark: { backgroundColor: COLORS.forestDepths },
   text: {
-    marginTop: SPACING.sm,
-    color: COLORS.textMuted,
-    fontSize: 14,
+    ...TYPE.body,
+    marginTop: SPACING.s16,
   },
+  textLight: { color: COLORS.lichenSage },
+  textDark: { color: COLORS.paleFern },
 });
-

@@ -1,12 +1,14 @@
-// API base URL and backend route constants (all frontend calls route to Express backend only).
+// API base URL and backend route constants read directly from mobile_app/.env (EXPO_PUBLIC_API_BASE_URL).
 
-import { Platform } from 'react-native';
+const rawApiBaseUrl = process.env.EXPO_PUBLIC_API_BASE_URL;
 
-const DEFAULT_LOCALHOST = Platform.OS === 'android'
-  ? 'http://10.0.2.2:5000/api/v1'
-  : 'http://localhost:5000/api/v1';
+if (!rawApiBaseUrl) {
+  throw new Error(
+    'Missing EXPO_PUBLIC_API_BASE_URL in mobile_app/.env. Set it to your backend URL (e.g. http://<LAN_IP>:5000/api/v1).'
+  );
+}
 
-export const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL || DEFAULT_LOCALHOST;
+export const API_BASE_URL = rawApiBaseUrl.replace(/\/+$/, '');
 
 export const ENDPOINTS = {
   HEALTH: '/health',
@@ -27,4 +29,3 @@ export const ENDPOINTS = {
   ALERTS: '/alerts',
   DASHBOARD: '/dashboard',
 };
-

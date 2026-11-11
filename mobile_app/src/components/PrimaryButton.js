@@ -1,4 +1,4 @@
-// Accessible primary action button with disabled and loading state support.
+// Primary Electric Sprout pill CTA and outlined secondary buttons per mobile_app/design.md.
 
 import React from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text } from 'react-native';
@@ -9,10 +9,25 @@ export const PrimaryButton = ({
   onPress,
   isLoading = false,
   disabled = false,
-  variant = 'primary',
+  variant = 'sprout',
+  compact = false,
+  style,
 }) => {
   const isInactive = disabled || isLoading;
-  const bgStyle = variant === 'danger' ? styles.dangerBg : styles.primaryBg;
+  const isOutlineDark = variant === 'outlineDark';
+  const isOutlineLight = variant === 'outlineLight';
+
+  const containerStyle = isOutlineDark
+    ? styles.outlineDark
+    : isOutlineLight
+    ? styles.outlineLight
+    : styles.sproutBg;
+
+  const textStyle = isOutlineDark
+    ? styles.textWhite
+    : isOutlineLight
+    ? styles.textOnyx
+    : styles.textCarbon;
 
   return (
     <Pressable
@@ -20,15 +35,18 @@ export const PrimaryButton = ({
       disabled={isInactive}
       style={({ pressed }) => [
         styles.button,
-        bgStyle,
+        compact ? styles.compactRadius : styles.pillRadius,
+        compact ? styles.compactPadding : styles.pillPadding,
+        containerStyle,
         isInactive && styles.disabled,
         pressed && !isInactive && styles.pressed,
+        style,
       ]}
     >
       {isLoading ? (
-        <ActivityIndicator color={COLORS.white} />
+        <ActivityIndicator color={isOutlineDark ? COLORS.pureWhite : COLORS.carbon} />
       ) : (
-        <Text style={styles.label}>{label}</Text>
+        <Text style={[styles.label, textStyle]}>{label}</Text>
       )}
     </Pressable>
   );
@@ -36,28 +54,34 @@ export const PrimaryButton = ({
 
 const styles = StyleSheet.create({
   button: {
-    paddingVertical: 14,
-    paddingHorizontal: SPACING.lg,
-    borderRadius: RADIUS.md,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  primaryBg: {
-    backgroundColor: COLORS.primary,
+  pillRadius: { borderRadius: RADIUS.pill },
+  compactRadius: { borderRadius: RADIUS.buttonCompact },
+  pillPadding: { paddingVertical: SPACING.s16, paddingHorizontal: SPACING.s24 },
+  compactPadding: { paddingVertical: SPACING.s8, paddingHorizontal: SPACING.s16 },
+  sproutBg: {
+    backgroundColor: COLORS.electricSprout,
   },
-  dangerBg: {
-    backgroundColor: COLORS.danger,
+  outlineDark: {
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: COLORS.pureWhite,
   },
-  disabled: {
-    opacity: 0.55,
+  outlineLight: {
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: COLORS.onyxOlive,
   },
-  pressed: {
-    opacity: 0.85,
-  },
+  disabled: { opacity: 0.45 },
+  pressed: { opacity: 0.85 },
   label: {
-    color: COLORS.white,
     fontSize: 15,
-    fontWeight: '700',
+    fontWeight: '500',
+    letterSpacing: -0.2,
   },
+  textCarbon: { color: COLORS.carbon },
+  textWhite: { color: COLORS.pureWhite },
+  textOnyx: { color: COLORS.onyxOlive },
 });
-

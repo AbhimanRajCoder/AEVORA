@@ -13,7 +13,7 @@ export const RootNavigator = () => {
   const { user, isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
-    return <LoadingState message="Restoring session..." />;
+    return <LoadingState dark message="Restoring session..." />;
   }
 
   return (
@@ -28,4 +28,3 @@ export const RootNavigator = () => {
     </NavigationContainer>
   );
 };
-

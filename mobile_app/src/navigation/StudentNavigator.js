@@ -1,10 +1,12 @@
-// Bottom tab + stack navigator for authenticated student users.
+// Student bottom tabs (floating pill bar) + native stack navigator in Forest Depths & Pure White.
 
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { FloatingPillTabBar } from '../components/FloatingPillTabBar';
 import { StudentHomeScreen } from '../screens/student/StudentHomeScreen';
 import { ModulesListScreen } from '../screens/student/ModulesListScreen';
+import { ModuleDetailScreen } from '../screens/student/ModuleDetailScreen';
 import { DrillsListScreen } from '../screens/student/DrillsListScreen';
 import { LeaderboardScreen } from '../screens/student/LeaderboardScreen';
 import { AlertsScreen } from '../screens/shared/AlertsScreen';
@@ -15,27 +17,57 @@ import { COLORS } from '../constants/theme';
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
+const sharedHeaderOptions = {
+  headerStyle: { backgroundColor: COLORS.forestDepths },
+  headerTintColor: COLORS.pureWhite,
+  headerTitleStyle: { fontWeight: '600', fontSize: 16 },
+  headerShadowVisible: false,
+};
+
 const StudentTabs = () => (
   <Tab.Navigator
-    screenOptions={{
-      tabBarActiveTintColor: COLORS.primary,
-      tabBarInactiveTintColor: COLORS.textMuted,
-    }}
+    tabBar={(props) => <FloatingPillTabBar {...props} />}
+    screenOptions={sharedHeaderOptions}
   >
-    <Tab.Screen name="Home" component={StudentHomeScreen} options={{ title: 'AEVORA' }} />
-    <Tab.Screen name="Modules" component={ModulesListScreen} options={{ title: 'Modules' }} />
-    <Tab.Screen name="Drills" component={DrillsListScreen} options={{ title: 'Drills' }} />
-    <Tab.Screen name="Alerts" component={AlertsScreen} options={{ title: 'Alerts' }} />
-    <Tab.Screen name="Emergency" component={EmergencyContactsScreen} options={{ title: 'SOS' }} />
+    <Tab.Screen
+      name="Home"
+      component={StudentHomeScreen}
+      options={{ headerShown: false, tabBarLabel: 'Home' }}
+    />
+    <Tab.Screen
+      name="Modules"
+      component={ModulesListScreen}
+      options={{ title: 'Learning Modules', tabBarLabel: 'Learn' }}
+    />
+    <Tab.Screen
+      name="Drills"
+      component={DrillsListScreen}
+      options={{ title: 'Virtual Drills', tabBarLabel: 'Drills' }}
+    />
+    <Tab.Screen
+      name="Alerts"
+      component={AlertsScreen}
+      options={{ title: 'Campus Alerts', tabBarLabel: 'Alerts' }}
+    />
+    <Tab.Screen
+      name="Emergency"
+      component={EmergencyContactsScreen}
+      options={{ title: 'Emergency SOS', tabBarLabel: 'SOS' }}
+    />
   </Tab.Navigator>
 );
 
 export const StudentNavigator = () => (
-  <Stack.Navigator>
+  <Stack.Navigator screenOptions={sharedHeaderOptions}>
     <Stack.Screen
       name="StudentTabs"
       component={StudentTabs}
       options={{ headerShown: false }}
+    />
+    <Stack.Screen
+      name="ModuleDetail"
+      component={ModuleDetailScreen}
+      options={({ route }) => ({ title: route.params?.title || 'Module Details' })}
     />
     <Stack.Screen
       name="Leaderboard"
@@ -49,4 +81,3 @@ export const StudentNavigator = () => (
     />
   </Stack.Navigator>
 );
-

@@ -1,15 +1,20 @@
-// Horizontal progress bar component for module completion and preparedness metrics.
+// Flat horizontal progress bar using Electric Sprout or Deep Verdant fill.
 
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { COLORS, RADIUS } from '../constants/theme';
 
-export const ProgressBar = ({ percentage = 0 }) => {
+export const ProgressBar = ({ percentage = 0, dark = false }) => {
   const clamped = Math.max(0, Math.min(100, percentage));
 
   return (
-    <View style={styles.track}>
-      <View style={[styles.fill, { width: `${clamped}%` }]} />
+    <View style={[styles.track, dark ? styles.trackDark : styles.trackLight]}>
+      <View
+        style={[
+          styles.fill,
+          { width: `${clamped}%`, backgroundColor: dark ? COLORS.electricSprout : COLORS.deepVerdant },
+        ]}
+      />
     </View>
   );
 };
@@ -17,14 +22,17 @@ export const ProgressBar = ({ percentage = 0 }) => {
 const styles = StyleSheet.create({
   track: {
     height: 8,
-    backgroundColor: COLORS.border,
-    borderRadius: RADIUS.full,
+    borderRadius: RADIUS.orb,
     overflow: 'hidden',
+  },
+  trackLight: {
+    backgroundColor: COLORS.mistGreen,
+  },
+  trackDark: {
+    backgroundColor: COLORS.onyxOlive,
   },
   fill: {
     height: '100%',
-    backgroundColor: COLORS.primary,
-    borderRadius: RADIUS.full,
+    borderRadius: RADIUS.orb,
   },
 });
-

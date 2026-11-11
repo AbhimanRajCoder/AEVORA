@@ -1,8 +1,8 @@
-// Reusable error message view with optional retry action.
+// Error state with hairline Bone White framing and Electric Sprout retry CTA.
 
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { COLORS, SPACING } from '../constants/theme';
+import { COLORS, SPACING, TYPE } from '../constants/theme';
 import { PrimaryButton } from './PrimaryButton';
 
 export const ErrorState = ({ message = 'Something went wrong.', onRetry }) => (
@@ -18,20 +18,18 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: SPACING.lg,
-    backgroundColor: COLORS.background,
+    padding: SPACING.s24,
+    backgroundColor: COLORS.pureWhite,
   },
   title: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: COLORS.danger,
-    marginBottom: SPACING.xs,
+    ...TYPE.headingSm,
+    color: COLORS.onyxOlive,
+    marginBottom: SPACING.s8,
   },
   message: {
-    fontSize: 14,
-    color: COLORS.textMuted,
+    ...TYPE.body,
+    color: COLORS.lichenSage,
     textAlign: 'center',
-    marginBottom: SPACING.md,
+    marginBottom: SPACING.s24,
   },
 });
-

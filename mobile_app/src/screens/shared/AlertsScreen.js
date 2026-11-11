@@ -1,4 +1,4 @@
-// Shared Alerts screen fetching institution alerts from GET /api/v1/alerts.
+// Shared Alerts feed in Pure White & Bone White with neo-botanical severity badges.
 
 import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList, RefreshControl, StyleSheet, Text, View } from 'react-native';
@@ -8,7 +8,7 @@ import { SeverityBadge } from '../../components/SeverityBadge';
 import { LoadingState } from '../../components/LoadingState';
 import { ErrorState } from '../../components/ErrorState';
 import { EmptyState } from '../../components/EmptyState';
-import { COLORS, SPACING } from '../../constants/theme';
+import { COLORS, FONTS, SPACING, TYPE } from '../../constants/theme';
 
 export const AlertsScreen = () => {
   const [alerts, setAlerts] = useState([]);
@@ -51,7 +51,7 @@ export const AlertsScreen = () => {
         <EmptyState title="No active alerts" subtitle="Your institution has not posted any alerts yet." />
       }
       renderItem={({ item }) => (
-        <Card>
+        <Card variant="light">
           <View style={styles.header}>
             <SeverityBadge severity={item.severity} />
             <Text style={styles.date}>{new Date(item.created_at).toLocaleDateString()}</Text>
@@ -65,11 +65,20 @@ export const AlertsScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  list: { flex: 1, backgroundColor: COLORS.background },
-  container: { padding: SPACING.md, flexGrow: 1 },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: SPACING.xs },
-  date: { fontSize: 12, color: COLORS.textMuted },
-  title: { fontSize: 16, fontWeight: '700', color: COLORS.text, marginBottom: SPACING.xs },
-  message: { fontSize: 14, color: COLORS.textMuted, lineHeight: 20 },
+  list: { flex: 1, backgroundColor: COLORS.pureWhite },
+  container: { padding: SPACING.s24, paddingBottom: 112, flexGrow: 1 },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: SPACING.s16,
+  },
+  date: {
+    fontFamily: FONTS.serif,
+    fontSize: 13,
+    fontStyle: 'italic',
+    color: COLORS.lichenSage,
+  },
+  title: { ...TYPE.headingSm, color: COLORS.onyxOlive, marginBottom: SPACING.s8 },
+  message: { ...TYPE.body, color: COLORS.lichenSage },
 });
-

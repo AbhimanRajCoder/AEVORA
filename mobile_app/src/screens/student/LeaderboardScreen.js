@@ -1,4 +1,4 @@
-// Institution leaderboard screen fetching student rankings from GET /api/v1/leaderboard.
+// Institution leaderboard with Forest Depths standing header and Bone White ranking rows.
 
 import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList, RefreshControl, StyleSheet, Text, View } from 'react-native';
@@ -7,7 +7,7 @@ import { Card } from '../../components/Card';
 import { LoadingState } from '../../components/LoadingState';
 import { ErrorState } from '../../components/ErrorState';
 import { EmptyState } from '../../components/EmptyState';
-import { COLORS, SPACING } from '../../constants/theme';
+import { COLORS, FONTS, RADIUS, SPACING, TYPE } from '../../constants/theme';
 
 export const LeaderboardScreen = () => {
   const [board, setBoard] = useState({ leaderboard: [], current_user: null, total_students: 0 });
@@ -48,11 +48,12 @@ export const LeaderboardScreen = () => {
       }
       ListHeaderComponent={
         board.current_user ? (
-          <Card style={styles.myCard}>
-            <Text style={styles.myLabel}>Your Standing</Text>
-            <Text style={styles.myRank}>
-              Rank #{board.current_user.rank} · {board.current_user.points} pts
-            </Text>
+          <Card variant="dark">
+            <Text style={styles.myLabel}>YOUR STANDING</Text>
+            <View style={styles.myRow}>
+              <Text style={styles.myRank}>#{board.current_user.rank}</Text>
+              <Text style={styles.myPts}>{board.current_user.points} pts</Text>
+            </View>
           </Card>
         ) : null
       }
@@ -60,11 +61,13 @@ export const LeaderboardScreen = () => {
         <EmptyState title="No ranked students yet" subtitle="Complete quizzes and drills to earn points." />
       }
       renderItem={({ item }) => (
-        <Card style={styles.rowCard}>
+        <Card variant="light" style={styles.rowCard}>
           <View style={styles.row}>
             <Text style={styles.rank}>#{item.rank}</Text>
             <Text style={styles.name}>{item.full_name}</Text>
-            <Text style={styles.pts}>{item.points} pts</Text>
+            <View style={styles.sproutChip}>
+              <Text style={styles.pts}>{item.points} pts</Text>
+            </View>
           </View>
         </Card>
       )}
@@ -73,15 +76,21 @@ export const LeaderboardScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  list: { flex: 1, backgroundColor: COLORS.background },
-  container: { padding: SPACING.md, flexGrow: 1 },
-  myCard: { backgroundColor: COLORS.primaryLight, borderColor: COLORS.primary },
-  myLabel: { fontSize: 12, fontWeight: '700', color: COLORS.primary },
-  myRank: { fontSize: 18, fontWeight: '800', color: COLORS.text, marginTop: 2 },
-  rowCard: { marginBottom: SPACING.sm },
+  list: { flex: 1, backgroundColor: COLORS.pureWhite },
+  container: { padding: SPACING.s24, paddingBottom: 112, flexGrow: 1 },
+  myLabel: { ...TYPE.caption, color: COLORS.paleFern, letterSpacing: 0.8, marginBottom: SPACING.s8 },
+  myRow: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' },
+  myRank: { fontFamily: FONTS.display, ...TYPE.display, color: COLORS.electricSprout },
+  myPts: { fontFamily: FONTS.serif, fontSize: 20, fontStyle: 'italic', color: COLORS.pureWhite },
+  rowCard: { padding: SPACING.s16, marginBottom: SPACING.s8 },
   row: { flexDirection: 'row', alignItems: 'center' },
-  rank: { width: 40, fontSize: 15, fontWeight: '800', color: COLORS.primary },
-  name: { flex: 1, fontSize: 15, fontWeight: '600', color: COLORS.text },
-  pts: { fontSize: 14, fontWeight: '700', color: COLORS.textMuted },
+  rank: { width: 40, fontSize: 15, fontWeight: '700', color: COLORS.deepVerdant },
+  name: { flex: 1, ...TYPE.bodyMd, color: COLORS.onyxOlive },
+  sproutChip: {
+    backgroundColor: COLORS.sproutWash,
+    borderRadius: RADIUS.badge,
+    paddingVertical: SPACING.badgeV,
+    paddingHorizontal: 12,
+  },
+  pts: { fontSize: 12, fontWeight: '500', color: COLORS.mossShadow },
 });
-

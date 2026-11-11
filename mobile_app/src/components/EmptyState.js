@@ -1,8 +1,8 @@
-// Reusable empty state view for lists with zero records.
+// Empty state panel with calm Lichen Sage subtitle and editorial serif accent.
 
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { COLORS, SPACING } from '../constants/theme';
+import { COLORS, FONTS, SPACING, TYPE } from '../constants/theme';
 
 export const EmptyState = ({ title = 'Nothing here yet', subtitle = '' }) => (
   <View style={styles.container}>
@@ -15,18 +15,18 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     justifyContent: 'center',
-    padding: SPACING.xl,
+    padding: SPACING.s32,
   },
   title: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: COLORS.text,
-    marginBottom: SPACING.xs,
+    fontFamily: FONTS.serif,
+    fontSize: 18,
+    fontStyle: 'italic',
+    color: COLORS.onyxOlive,
+    marginBottom: SPACING.s8,
   },
   subtitle: {
-    fontSize: 14,
-    color: COLORS.textMuted,
+    ...TYPE.body,
+    color: COLORS.lichenSage,
     textAlign: 'center',
   },
 });
-

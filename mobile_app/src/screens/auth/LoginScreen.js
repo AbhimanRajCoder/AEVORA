@@ -1,4 +1,4 @@
-// Login screen authenticating exclusively against backend POST /api/v1/auth/login.
+// Login screen in Forest Depths dark canvas with Electric Sprout pill CTA and focus borders.
 
 import React, { useState } from 'react';
 import {
@@ -11,14 +11,18 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../context/AuthContext';
+import { AtmosphericOrb } from '../../components/AtmosphericOrb';
 import { PrimaryButton } from '../../components/PrimaryButton';
-import { COLORS, RADIUS, SPACING } from '../../constants/theme';
+import { COLORS, FONTS, RADIUS, SPACING, TYPE } from '../../constants/theme';
 
 export const LoginScreen = ({ navigation }) => {
+  const insets = useSafeAreaInsets();
   const { signIn } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [focusedField, setFocusedField] = useState(null);
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -41,31 +45,56 @@ export const LoginScreen = ({ navigation }) => {
 
   return (
     <KeyboardAvoidingView
-      style={styles.flex}
+      style={styles.canvas}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-        <Text style={styles.brand}>AEVORA</Text>
-        <Text style={styles.subtitle}>Disaster Preparedness & Safety Education</Text>
+      <AtmosphericOrb style={styles.orbTopRight} />
+      <ScrollView
+        contentContainerStyle={[
+          styles.container,
+          { paddingTop: insets.top + SPACING.s32, paddingBottom: insets.bottom + SPACING.s32 },
+        ]}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={styles.announcementPill}>
+          <Text style={styles.announcementText}>
+            Campus Safety · <Text style={styles.sproutText}>AEVORA</Text> v1.0
+          </Text>
+        </View>
 
-        <View style={styles.form}>
-          <Text style={styles.label}>Email</Text>
+        <Text style={styles.heroTitle}>
+          Be{'\n'}
+          ready{'\n'}
+          <Text style={styles.sproutText}>now.</Text>
+        </Text>
+        <Text style={styles.heroSubtitle}>
+          Interactive disaster modules, server-graded quizzes, and campus emergency drills.
+        </Text>
+
+        <View style={styles.darkPanel}>
+          <Text style={styles.label}>EMAIL</Text>
           <TextInput
-            style={styles.input}
+            style={[styles.input, focusedField === 'email' && styles.inputFocused]}
             value={email}
             onChangeText={setEmail}
+            onFocus={() => setFocusedField('email')}
+            onBlur={() => setFocusedField(null)}
             placeholder="student@institution.edu"
+            placeholderTextColor={COLORS.lichenSage}
             keyboardType="email-address"
             autoCapitalize="none"
             autoCorrect={false}
           />
 
-          <Text style={styles.label}>Password</Text>
+          <Text style={styles.label}>PASSWORD</Text>
           <TextInput
-            style={styles.input}
+            style={[styles.input, focusedField === 'password' && styles.inputFocused]}
             value={password}
             onChangeText={setPassword}
+            onFocus={() => setFocusedField('password')}
+            onBlur={() => setFocusedField(null)}
             placeholder="Enter your password"
+            placeholderTextColor={COLORS.lichenSage}
             secureTextEntry
           />
 
@@ -75,7 +104,7 @@ export const LoginScreen = ({ navigation }) => {
 
           <Pressable onPress={() => navigation.navigate('Signup')} style={styles.linkRow}>
             <Text style={styles.linkText}>
-              Don't have an account? <Text style={styles.linkBold}>Sign Up</Text>
+              New to your campus? <Text style={styles.linkUnderline}>Create an account</Text>
             </Text>
           </Pressable>
         </View>
@@ -85,64 +114,83 @@ export const LoginScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  flex: { flex: 1, backgroundColor: COLORS.background },
+  canvas: { flex: 1, backgroundColor: COLORS.forestDepths },
+  orbTopRight: { top: -110, right: -90 },
   container: {
     flexGrow: 1,
     justifyContent: 'center',
-    padding: SPACING.lg,
+    paddingHorizontal: SPACING.s24,
   },
-  brand: {
-    fontSize: 32,
-    fontWeight: '800',
-    color: COLORS.primary,
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 14,
-    color: COLORS.textMuted,
-    textAlign: 'center',
-    marginTop: SPACING.xs,
-    marginBottom: SPACING.xl,
-  },
-  form: {
-    backgroundColor: COLORS.surface,
-    padding: SPACING.lg,
-    borderRadius: RADIUS.lg,
+  announcementPill: {
+    alignSelf: 'flex-start',
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.lichenSage,
+    borderRadius: RADIUS.orb,
+    paddingVertical: SPACING.badgeV,
+    paddingHorizontal: SPACING.s16,
+    marginBottom: SPACING.s24,
+  },
+  announcementText: {
+    ...TYPE.body,
+    color: COLORS.pureWhite,
+  },
+  sproutText: {
+    color: COLORS.electricSprout,
+  },
+  heroTitle: {
+    fontFamily: FONTS.display,
+    ...TYPE.displayHero,
+    color: COLORS.pureWhite,
+    marginBottom: SPACING.s16,
+  },
+  heroSubtitle: {
+    ...TYPE.bodyMd,
+    color: COLORS.paleFern,
+    marginBottom: SPACING.s32,
+  },
+  darkPanel: {
+    backgroundColor: COLORS.forestDepths,
+    borderWidth: 1,
+    borderColor: COLORS.onyxOlive,
+    borderRadius: RADIUS.card,
+    padding: SPACING.s24,
   },
   label: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: COLORS.text,
-    marginBottom: SPACING.xs,
+    ...TYPE.caption,
+    color: COLORS.paleFern,
+    fontWeight: '500',
+    letterSpacing: 0.8,
+    marginBottom: SPACING.s8,
   },
   input: {
     borderWidth: 1,
-    borderColor: COLORS.border,
-    borderRadius: RADIUS.sm,
-    paddingHorizontal: SPACING.md,
-    paddingVertical: 12,
+    borderColor: COLORS.mossShadow,
+    borderRadius: RADIUS.input,
+    paddingHorizontal: SPACING.s16,
+    paddingVertical: 14,
     fontSize: 15,
-    marginBottom: SPACING.md,
-    backgroundColor: COLORS.background,
+    color: COLORS.pureWhite,
+    backgroundColor: COLORS.forestDepths,
+    marginBottom: SPACING.s16,
+  },
+  inputFocused: {
+    borderColor: COLORS.electricSprout,
   },
   error: {
-    color: COLORS.danger,
-    fontSize: 13,
-    marginBottom: SPACING.md,
+    ...TYPE.body,
+    color: COLORS.electricSprout,
+    marginBottom: SPACING.s16,
   },
   linkRow: {
-    marginTop: SPACING.md,
+    marginTop: SPACING.s24,
     alignItems: 'center',
   },
   linkText: {
-    fontSize: 14,
-    color: COLORS.textMuted,
+    ...TYPE.body,
+    color: COLORS.paleFern,
   },
-  linkBold: {
-    color: COLORS.primary,
-    fontWeight: '700',
+  linkUnderline: {
+    color: COLORS.electricSprout,
+    textDecorationLine: 'underline',
   },
 });
-

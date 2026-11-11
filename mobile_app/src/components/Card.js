@@ -1,21 +1,37 @@
-// Reusable surface card container.
+// Flat neo-botanical card container (Bone White on light, Forest Depths on dark, or elevated tilted mockup).
 
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { COLORS, RADIUS, SPACING } from '../constants/theme';
+import { COLORS, ELEVATION, RADIUS, SPACING } from '../constants/theme';
 
-export const Card = ({ children, style }) => (
-  <View style={[styles.card, style]}>{children}</View>
-);
+export const Card = ({ children, variant = 'light', style }) => {
+  const variantStyle =
+    variant === 'dark'
+      ? styles.dark
+      : variant === 'floating'
+      ? [styles.floating, ELEVATION.floatingMockup]
+      : styles.light;
+
+  return <View style={[styles.base, variantStyle, style]}>{children}</View>;
+};
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: COLORS.surface,
-    borderRadius: RADIUS.md,
-    padding: SPACING.md,
+  base: {
+    borderRadius: RADIUS.card,
+    padding: SPACING.s24,
     borderWidth: 1,
-    borderColor: COLORS.border,
-    marginBottom: SPACING.md,
+    marginBottom: SPACING.s16,
+  },
+  light: {
+    backgroundColor: COLORS.boneWhite,
+    borderColor: COLORS.mistGreen,
+  },
+  dark: {
+    backgroundColor: COLORS.forestDepths,
+    borderColor: COLORS.onyxOlive,
+  },
+  floating: {
+    backgroundColor: COLORS.pureWhite,
+    borderColor: COLORS.onyxOlive,
   },
 });
-

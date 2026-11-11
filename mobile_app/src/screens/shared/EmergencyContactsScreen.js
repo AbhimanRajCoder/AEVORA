@@ -1,13 +1,14 @@
-// Shared Emergency Contacts screen displaying national and local contacts with tap-to-call.
+// Emergency Contacts screen with Pure White / Bone White cards and Electric Sprout Call CTAs.
 
 import React, { useCallback, useEffect, useState } from 'react';
-import { Linking, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Linking, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { getContacts } from '../../services/contactService';
 import { Card } from '../../components/Card';
+import { PrimaryButton } from '../../components/PrimaryButton';
 import { LoadingState } from '../../components/LoadingState';
 import { ErrorState } from '../../components/ErrorState';
 import { EmptyState } from '../../components/EmptyState';
-import { COLORS, RADIUS, SPACING } from '../../constants/theme';
+import { COLORS, SPACING, TYPE } from '../../constants/theme';
 
 export const EmergencyContactsScreen = () => {
   const [contactsData, setContactsData] = useState({ national_contacts: [], local_contacts: [] });
@@ -37,24 +38,25 @@ export const EmergencyContactsScreen = () => {
   if (isLoading) return <LoadingState message="Loading emergency contacts..." />;
   if (error) return <ErrorState message={error} onRetry={() => loadContacts()} />;
 
-  const renderSection = (title, items) => (
+  const renderSection = (title, accent, items) => (
     <View style={styles.section}>
-      <Text style={styles.sectionTitle}>{title}</Text>
+      <Text style={styles.sectionTitle}>
+        {title} <Text style={styles.accent}>{accent}</Text>
+      </Text>
       {items.length === 0 ? (
         <EmptyState title="No contacts listed" />
       ) : (
         items.map((contact) => (
-          <Card key={contact.id} style={styles.contactCard}>
+          <Card key={contact.id} variant="light" style={styles.contactCard}>
             <View style={styles.info}>
               <Text style={styles.name}>{contact.name}</Text>
               <Text style={styles.phone}>{contact.phone}</Text>
             </View>
-            <Pressable
+            <PrimaryButton
+              label="Call"
+              compact
               onPress={() => Linking.openURL(`tel:${contact.phone}`)}
-              style={styles.callBtn}
-            >
-              <Text style={styles.callLabel}>Call</Text>
-            </Pressable>
+            />
           </Card>
         ))
       )}
@@ -69,27 +71,25 @@ export const EmergencyContactsScreen = () => {
         <RefreshControl refreshing={isRefreshing} onRefresh={() => loadContacts(true)} />
       }
     >
-      {renderSection('National Helplines', contactsData.national_contacts || [])}
-      {renderSection('Campus Contacts', contactsData.local_contacts || [])}
+      {renderSection('National', 'Helplines', contactsData.national_contacts || [])}
+      {renderSection('Campus', 'Contacts', contactsData.local_contacts || [])}
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: COLORS.background },
-  container: { padding: SPACING.md },
-  section: { marginBottom: SPACING.md },
-  sectionTitle: { fontSize: 16, fontWeight: '700', color: COLORS.text, marginBottom: SPACING.sm },
-  contactCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  info: { flex: 1, marginRight: SPACING.sm },
-  name: { fontSize: 15, fontWeight: '700', color: COLORS.text },
-  phone: { fontSize: 14, color: COLORS.textMuted, marginTop: 2 },
-  callBtn: {
-    backgroundColor: COLORS.danger,
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.sm,
-    borderRadius: RADIUS.sm,
+  screen: { flex: 1, backgroundColor: COLORS.pureWhite },
+  container: { padding: SPACING.s24, paddingBottom: 112 },
+  section: { marginBottom: SPACING.s24 },
+  sectionTitle: { ...TYPE.heading, color: COLORS.onyxOlive, marginBottom: SPACING.s16 },
+  accent: { color: COLORS.deepVerdant },
+  contactCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: SPACING.s16,
   },
-  callLabel: { color: COLORS.white, fontWeight: '700', fontSize: 13 },
+  info: { flex: 1, marginRight: SPACING.s16 },
+  name: { ...TYPE.bodyMd, fontWeight: '600', color: COLORS.onyxOlive },
+  phone: { ...TYPE.body, color: COLORS.lichenSage, marginTop: 2 },
 });
-

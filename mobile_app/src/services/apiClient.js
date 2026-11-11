@@ -21,20 +21,24 @@ const tryRefreshAccessToken = async () => {
   const { refreshToken } = await getTokens();
   if (!refreshToken) return null;
 
-  const response = await fetch(`${API_BASE_URL}${ENDPOINTS.AUTH.REFRESH}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ refresh_token: refreshToken }),
-  });
+  try {
+    const response = await fetch(`${API_BASE_URL}${ENDPOINTS.AUTH.REFRESH}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refresh_token: refreshToken }),
+    });
 
-  const payload = await response.json().catch(() => null);
-  if (!response.ok || !payload?.success || !payload?.data?.access_token) {
-    await clearTokens();
+    const payload = await response.json().catch(() => null);
+    if (!response.ok || !payload?.success || !payload?.data?.access_token) {
+      await clearTokens();
+      return null;
+    }
+
+    await saveTokens(payload.data.access_token, payload.data.refresh_token);
+    return payload.data.access_token;
+  } catch {
     return null;
   }
-
-  await saveTokens(payload.data.access_token, payload.data.refresh_token);
-  return payload.data.access_token;
 };
 
 /**
@@ -58,11 +62,18 @@ export const apiRequest = async (path, options = {}) => {
     }
   }
 
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    method,
-    headers: requestHeaders,
-    ...(body !== null ? { body: JSON.stringify(body) } : {}),
-  });
+  let response;
+  try {
+    response = await fetch(`${API_BASE_URL}${path}`, {
+      method,
+      headers: requestHeaders,
+      ...(body !== null ? { body: JSON.stringify(body) } : {}),
+    });
+  } catch (networkError) {
+    throw new Error(
+      `Cannot connect to backend at ${API_BASE_URL}. Ensure the backend server is running and EXPO_PUBLIC_API_BASE_URL in .env is reachable.`
+    );
+  }
 
   if (response.status === 401 && !skipAuth && !_retried) {
     const refreshedToken = await tryRefreshAccessToken();
