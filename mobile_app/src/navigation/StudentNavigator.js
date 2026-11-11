@@ -9,6 +9,7 @@ import { ModulesListScreen } from '../screens/student/ModulesListScreen';
 import { ModuleDetailScreen } from '../screens/student/ModuleDetailScreen';
 import { LessonReaderScreen } from '../screens/student/LessonReaderScreen';
 import { QuizScreen } from '../screens/student/QuizScreen';
+import { QuizResultScreen } from '../screens/student/QuizResultScreen';
 import { DrillsListScreen } from '../screens/student/DrillsListScreen';
 import { LeaderboardScreen } from '../screens/student/LeaderboardScreen';
 import { AlertsScreen } from '../screens/shared/AlertsScreen';
@@ -80,6 +81,11 @@ export const StudentNavigator = () => (
       name="Quiz"
       component={QuizScreen}
       options={({ route }) => ({ title: route.params?.moduleTitle ? `${route.params.moduleTitle} Quiz` : 'Module Quiz' })}
+    />
+    <Stack.Screen
+      name="QuizResult"
+      component={QuizResultScreen}
+      options={{ title: 'Quiz Results' }}
     />
     <Stack.Screen
       name="Leaderboard"
