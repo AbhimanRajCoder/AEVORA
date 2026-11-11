@@ -8,7 +8,7 @@ import { supabase, supabaseAuth } from '../config/supabase.js';
  * @param {string|undefined} institutionId - Optional institution UUID.
  * @returns {Promise<string|null>} Verified institution UUID or null.
  */
-const resolveInstitutionId = async (institutionId) => {
+export const resolveInstitutionId = async (institutionId) => {
   if (institutionId) {
     const { data, error } = await supabase
       .from('institutions')
@@ -41,7 +41,7 @@ const resolveInstitutionId = async (institutionId) => {
  * @param {object} profile - User profile row from public.profiles.
  * @returns {object} Normalized auth payload for clients.
  */
-const formatAuthResponse = (session, authUser, profile) => ({
+export const formatAuthResponse = (session, authUser, profile) => ({
   access_token: session.access_token,
   refresh_token: session.refresh_token,
   expires_at: session.expires_at,

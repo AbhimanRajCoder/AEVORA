@@ -25,22 +25,22 @@ dotenv.config({ path: path.resolve(__dirname, '.env') });
 dotenv.config();
 
 const app = express();
+app.set('trust proxy', 1);
 const PORT = process.env.PORT || 5000;
 const allowedOrigins = process.env.CORS_ORIGIN
   ? process.env.CORS_ORIGIN.split(',').map((origin) => origin.trim())
   : ['http://localhost:3000', 'http://localhost:5173'];
 
-// Configure CORS middleware
+// Configure CORS middleware allowing mobile clients, configured origins, and same-origin callbacks
 app.use(
-  cors({
-    origin: (origin, callback) => {
-      // Allow requests with no origin (e.g. mobile apps, curl, or server-to-server)
-      if (!origin || allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-      return callback(new Error(`Origin ${origin} not allowed by CORS`));
-    },
-    credentials: true,
+  cors((req, callback) => {
+    const origin = req.header('Origin');
+    const host = req.get('host');
+    const sameOrigin = host ? `${req.protocol}://${host}` : null;
+    if (!origin || allowedOrigins.includes(origin) || (sameOrigin && origin === sameOrigin)) {
+      return callback(null, { origin: true, credentials: true });
+    }
+    return callback(new Error(`Origin ${origin} not allowed by CORS`));
   })
 );
 

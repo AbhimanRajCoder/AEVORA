@@ -15,6 +15,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../context/AuthContext';
 import { AtmosphericOrb } from '../../components/AtmosphericOrb';
 import { PrimaryButton } from '../../components/PrimaryButton';
+import { GoogleSignInButton } from '../../components/GoogleSignInButton';
 import { COLORS, FONTS, RADIUS, SPACING, TYPE } from '../../constants/theme';
 
 export const LoginScreen = ({ navigation }) => {
@@ -131,6 +132,8 @@ export const LoginScreen = ({ navigation }) => {
           ) : null}
 
           <PrimaryButton label="Sign In" onPress={handleLogin} isLoading={isSubmitting} />
+
+          <GoogleSignInButton onError={setError} disabled={isSubmitting} />
 
           <Pressable onPress={() => navigation.navigate('Signup')} style={styles.linkRow}>
             <Text style={styles.linkText}>

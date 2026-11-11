@@ -67,6 +67,13 @@ const invokeApp = (app, { method = 'GET', url = '/', headers = {}, body = null }
         resolve({ status: this.statusCode, headers: resHeaders, body: payload });
         return this;
       },
+      redirect(code, target) {
+        this.statusCode = typeof code === 'number' ? code : 302;
+        resHeaders.location = typeof code === 'string' ? code : target;
+        this.headersSent = true;
+        resolve({ status: this.statusCode, headers: resHeaders, body: null });
+        return this;
+      },
     };
 
     app(req, res, (err) => {
@@ -265,6 +272,86 @@ describe('Phase 0: Auth Proxy & Institution Endpoints', () => {
     assert.equal(okMe.status, 200);
     assert.equal(okMe.body.data.email, 'student@inst-a.edu');
     assert.equal(okMe.body.data.role, 'student');
+  });
+
+  it('Supabase Google Sign-In start, launch cookie redirect, callback bridge, complete, status poll, and id_token work', async () => {
+    mock.method(supabaseAuth.auth, 'signInWithOAuth', async ({ provider, options }) => ({
+      data: { provider, url: `https://example.supabase.co/auth/v1/authorize?provider=google&redirect_to=${encodeURIComponent(options.redirectTo)}` },
+      error: null,
+    }));
+
+    const startRes = await invokeApp(app, { method: 'POST', url: '/api/v1/auth/google/start', body: {} });
+    assert.equal(startRes.status, 200);
+    assert.ok(startRes.body.data.auth_url.includes('/api/v1/auth/google/launch?state='));
+    const { state } = startRes.body.data;
+
+    const launchRes = await invokeApp(app, {
+      method: 'GET',
+      url: `/api/v1/auth/google/launch?state=${state}`,
+    });
+    assert.equal(launchRes.status, 302);
+    assert.ok(launchRes.headers.location.includes('provider=google'));
+    assert.ok(String(launchRes.headers['set-cookie']).includes(`aevora_oauth_state=${state}`));
+
+    const pendingRes = await invokeApp(app, {
+      method: 'GET',
+      url: `/api/v1/auth/google/status?state=${state}`,
+    });
+    assert.equal(pendingRes.status, 200);
+    assert.equal(pendingRes.body.data.status, 'pending');
+
+    const cbRes = await invokeApp(app, {
+      method: 'GET',
+      url: '/api/v1/auth/google/callback',
+    });
+    assert.equal(cbRes.status, 200);
+    assert.ok(String(cbRes.body).includes('/api/v1/auth/google/complete'));
+
+    mock.method(supabase.auth, 'getUser', async () => ({
+      data: {
+        user: {
+          id: sampleProfile.id,
+          email: 'google@inst-a.edu',
+          user_metadata: { full_name: 'Google Student' },
+        },
+      },
+      error: null,
+    }));
+    mock.method(supabase, 'from', () => createQueryMock({ data: sampleProfile, error: null }));
+
+    const completeRes = await invokeApp(app, {
+      method: 'POST',
+      url: '/api/v1/auth/google/complete',
+      headers: { Cookie: `aevora_oauth_state=${state}` },
+      body: { access_token: 'google-sb-access', refresh_token: 'google-sb-refresh', expires_at: 2000000000 },
+    });
+    assert.equal(completeRes.status, 200);
+    assert.equal(completeRes.body.data.ok, true);
+
+    const doneRes = await invokeApp(app, {
+      method: 'GET',
+      url: `/api/v1/auth/google/status?state=${state}`,
+    });
+    assert.equal(doneRes.status, 200);
+    assert.equal(doneRes.body.data.status, 'completed');
+    assert.equal(doneRes.body.data.access_token, 'google-sb-access');
+    assert.equal(doneRes.body.data.user.email, 'google@inst-a.edu');
+
+    mock.method(supabaseAuth.auth, 'signInWithIdToken', async () => ({
+      data: {
+        session: { access_token: 'idtoken-sb-access', refresh_token: 'idtoken-sb-refresh', expires_at: 2000000000 },
+        user: { id: sampleProfile.id, email: 'google@inst-a.edu', user_metadata: { full_name: 'Google Student' } },
+      },
+      error: null,
+    }));
+
+    const tokenRes = await invokeApp(app, {
+      method: 'POST',
+      url: '/api/v1/auth/google',
+      body: { id_token: 'valid-google-id-token' },
+    });
+    assert.equal(tokenRes.status, 200);
+    assert.equal(tokenRes.body.data.access_token, 'idtoken-sb-access');
   });
 });
 

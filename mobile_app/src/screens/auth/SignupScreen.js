@@ -17,6 +17,7 @@ import { useAuth } from '../../context/AuthContext';
 import { getInstitutions } from '../../services/authService';
 import { AtmosphericOrb } from '../../components/AtmosphericOrb';
 import { PrimaryButton } from '../../components/PrimaryButton';
+import { GoogleSignInButton } from '../../components/GoogleSignInButton';
 import { COLORS, FONTS, RADIUS, SPACING, TYPE } from '../../constants/theme';
 
 export const SignupScreen = ({ navigation }) => {
@@ -211,6 +212,12 @@ export const SignupScreen = ({ navigation }) => {
           ) : null}
 
           <PrimaryButton label="Create Account" onPress={handleSignup} isLoading={isSubmitting} />
+
+          <GoogleSignInButton
+            institutionId={selectedInstitutionId || undefined}
+            onError={setError}
+            disabled={isSubmitting}
+          />
 
           <Pressable onPress={() => navigation.goBack()} style={styles.linkRow}>
             <Text style={styles.linkText}>

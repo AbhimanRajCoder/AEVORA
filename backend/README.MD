@@ -119,6 +119,18 @@ Every endpoint returns a consistent JSON envelope defined in `utils/responseHelp
 | `POST` | `/api/v1/auth/login` | Public | Any | Sign in with email & password and return tokens + profile |
 | `POST` | `/api/v1/auth/refresh` | Public | Any | Refresh an expired access token |
 | `POST` | `/api/v1/auth/logout` | Public | Any | Close current session |
+| `POST` | `/api/v1/auth/google/start` | Public | Any | Start Supabase Google OAuth flow & return browser launch URL |
+| `GET` | `/api/v1/auth/google/launch` | Public | Any | Set browser OAuth cookie and redirect to Supabase Google consent |
+| `GET` | `/api/v1/auth/google/callback` | Public | Any | Supabase OAuth redirect bridge page |
+| `POST` | `/api/v1/auth/google/complete` | Public | Any | Verify Supabase OAuth tokens & provision profile |
+| `GET` | `/api/v1/auth/google/status` | Public | Any | Poll & consume completed Google OAuth session tokens |
+| `POST` | `/api/v1/auth/google` | Public | Any | Sign in via Supabase `signInWithIdToken` with Google `id_token` |
+| `POST` | `/api/v1/auth/google/start` | Public | Any | Start Supabase Google OAuth flow & return browser launch URL |
+| `GET` | `/api/v1/auth/google/launch` | Public | Any | Set browser OAuth cookie and redirect to Supabase Google consent |
+| `GET` | `/api/v1/auth/google/callback` | Public | Any | Supabase OAuth redirect bridge page |
+| `POST` | `/api/v1/auth/google/complete` | Public | Any | Verify Supabase OAuth tokens & provision profile |
+| `GET` | `/api/v1/auth/google/status` | Public | Any | Poll & consume completed Google OAuth session tokens |
+| `POST` | `/api/v1/auth/google` | Public | Any | Sign in via Supabase `signInWithIdToken` with Google `id_token` |
 | `GET` | `/api/v1/auth/me` | Bearer | Any | Get authenticated user's profile |
 | `GET` | `/api/v1/institutions` | Public | Any | List available institutions for signup |
 | `GET` | `/api/v1/modules` | Bearer | Any | List all learning modules with user progress |
@@ -306,6 +318,12 @@ Closes the user's session on the server (optional `Authorization: Bearer <token>
   "error": null
 }
 ```
+
+#### `POST /api/v1/auth/google/start`, `GET /api/v1/auth/google/launch`, `GET /api/v1/auth/google/callback`, `POST /api/v1/auth/google/complete`, `GET /api/v1/auth/google/status`, `POST /api/v1/auth/google`
+Backend-proxied Supabase Google Sign-In. Mobile clients call `POST /api/v1/auth/google/start` to retrieve `{ auth_url, state }`, open `auth_url` (`/api/v1/auth/google/launch`, which sets an `HttpOnly` state cookie and redirects to Supabase's static `/api/v1/auth/google/callback` redirect URL), let the callback bridge post Supabase tokens to `/api/v1/auth/google/complete`, and poll `GET /api/v1/auth/google/status?state=...` for `{ status: "completed", access_token, refresh_token, user }`. Alternatively, `POST /api/v1/auth/google` signs in directly with a Google `id_token` via `supabase.auth.signInWithIdToken`.
+
+#### `POST /api/v1/auth/google/start`, `GET /api/v1/auth/google/launch`, `GET /api/v1/auth/google/callback`, `POST /api/v1/auth/google/complete`, `GET /api/v1/auth/google/status`, `POST /api/v1/auth/google`
+Backend-proxied Supabase Google Sign-In. Mobile clients call `POST /api/v1/auth/google/start` to retrieve `{ auth_url, state }`, open `auth_url` (`/api/v1/auth/google/launch`, which sets an `HttpOnly` state cookie and redirects to Supabase's static `/api/v1/auth/google/callback` redirect URL), let the callback bridge post Supabase tokens to `/api/v1/auth/google/complete`, and poll `GET /api/v1/auth/google/status?state=...` for `{ status: "completed", access_token, refresh_token, user }`. Alternatively, `POST /api/v1/auth/google` signs in directly with a Google `id_token` via `supabase.auth.signInWithIdToken`.
 
 #### `GET /api/v1/auth/me`
 Returns the authenticated user's profile attached by `requireAuth`.

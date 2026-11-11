@@ -57,3 +57,35 @@ export const getInstitutions = async () => {
   return apiRequest(ENDPOINTS.INSTITUTIONS, { skipAuth: true });
 };
 
+// Starts backend-proxied Supabase Google OAuth and returns { auth_url, state }.
+export const startGoogleAuth = async (institution_id) => {
+  return apiRequest(ENDPOINTS.AUTH.GOOGLE_START, {
+    method: 'POST',
+    body: institution_id ? { institution_id } : {},
+    skipAuth: true,
+  });
+};
+
+// Polls backend for completed Supabase Google OAuth session tokens.
+export const getGoogleAuthStatus = async (state) => {
+  return apiRequest(`${ENDPOINTS.AUTH.GOOGLE_STATUS}?state=${encodeURIComponent(state)}`, {
+    skipAuth: true,
+  });
+};
+
+// Persists tokens returned by a completed Google OAuth session.
+export const persistGoogleSession = async ({ access_token, refresh_token }) => {
+  await saveTokens(access_token, refresh_token || '');
+};
+
+// Signs in via backend POST /api/v1/auth/google with a Google id_token.
+export const loginWithGoogleIdToken = async ({ id_token, institution_id }) => {
+  const data = await apiRequest(ENDPOINTS.AUTH.GOOGLE_TOKEN, {
+    method: 'POST',
+    body: { id_token, ...(institution_id ? { institution_id } : {}) },
+    skipAuth: true,
+  });
+  await saveTokens(data.access_token, data.refresh_token || '');
+  return data;
+};
+

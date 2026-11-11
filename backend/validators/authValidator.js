@@ -79,3 +79,39 @@ export const validateRefresh = (req, res, next) => {
   return next();
 };
 
+// Validates optional institution_id on POST /api/v1/auth/google/start.
+export const validateGoogleStart = (req, res, next) => {
+  const { institution_id } = req.body || {};
+  if (institution_id !== undefined && institution_id !== null && institution_id !== '') {
+    if (typeof institution_id !== 'string' || !UUID_REGEX.test(institution_id)) {
+      return sendError(res, 'Invalid institution_id format: must be a valid UUID', 400);
+    }
+  }
+  return next();
+};
+
+// Validates completion payload using body state or browser OAuth cookie.
+export const validateGoogleComplete = (req, res, next) => {
+  const cookieHeader = req.headers?.cookie || '';
+  const hasCookieState = /(?:^|;\s*)aevora_oauth_state=[^;]+/.test(cookieHeader);
+  const { state } = req.body || {};
+  if ((!state || typeof state !== 'string' || !state.trim()) && !hasCookieState) {
+    return sendError(res, 'state is required', 400);
+  }
+  return next();
+};
+
+// Validates id_token payload on POST /api/v1/auth/google.
+export const validateGoogleIdToken = (req, res, next) => {
+  const { id_token, institution_id } = req.body || {};
+  if (!id_token || typeof id_token !== 'string' || !id_token.trim()) {
+    return sendError(res, 'id_token is required', 400);
+  }
+  if (institution_id !== undefined && institution_id !== null && institution_id !== '') {
+    if (typeof institution_id !== 'string' || !UUID_REGEX.test(institution_id)) {
+      return sendError(res, 'Invalid institution_id format: must be a valid UUID', 400);
+    }
+  }
+  return next();
+};
+

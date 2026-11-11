@@ -64,6 +64,12 @@ export const AuthProvider = ({ children }) => {
     return profile;
   }, []);
 
+  const completeGoogleSignIn = useCallback(async (session) => {
+    await authService.persistGoogleSession(session);
+    setUser(session.user);
+    return session.user;
+  }, []);
+
   return (
     <AuthContext.Provider
       value={{
@@ -74,6 +80,7 @@ export const AuthProvider = ({ children }) => {
         signUp,
         signOut,
         refreshUser,
+        completeGoogleSignIn,
       }}
     >
       {children}
