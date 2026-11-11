@@ -154,6 +154,8 @@ const readCookie = (cookieHeader = '', name) => {
 };
 
 const getRequestBaseUrl = (req) => {
+  const configured = process.env.BACKEND_PUBLIC_URL?.trim() || process.env.RENDER_EXTERNAL_URL?.trim();
+  if (configured) return configured.replace(/\/+$/, '');
   const host = req.get?.('host') || 'localhost:5000';
   return `${req.protocol || 'http'}://${host}`;
 };
