@@ -101,11 +101,7 @@ export const StudentHomeScreen = ({ navigation }) => {
           </Pressable>
         </View>
 
-        <Text style={styles.heroHeadline}>
-          Stay{'\n'}
-          safe <Text style={styles.sproutAccent}>all</Text>{'\n'}
-          semester.
-        </Text>
+        <Text style={styles.heroHeadline}>Student dashboard</Text>
         <Text style={styles.heroSubcopy}>
           Welcome back, {user?.full_name || 'Student'}. Track modules and practice drills.
         </Text>
@@ -145,11 +141,11 @@ export const StudentHomeScreen = ({ navigation }) => {
             <Card variant="light">
               <View style={styles.alertRow}>
                 <View style={styles.sproutChip}>
-                  <Text style={styles.sproutChipText}>ALL CLEAR</Text>
+                  <Text style={styles.sproutChipText}>CAMPUS ALERTS</Text>
                 </View>
                 <Text style={styles.viewAllLink}>Alerts →</Text>
               </View>
-              <Text style={styles.cardTitle}>No active campus emergencies</Text>
+              <Text style={styles.cardTitle}>No campus alerts posted</Text>
               <Text style={styles.cardBody}>
                 Tap here anytime to view published institution safety advisories.
               </Text>
@@ -167,7 +163,7 @@ export const StudentHomeScreen = ({ navigation }) => {
             onPress={() => navigation.navigate('Modules')}
           >
             <View style={styles.sproutChip}>
-              <Text style={styles.sproutChipText}>01 · Learn</Text>
+              <Text style={styles.sproutChipText}>Learn</Text>
             </View>
             <Text style={styles.gridTitle}>Modules</Text>
             <Text style={styles.gridSub}>{modules.length} safety courses</Text>
@@ -178,7 +174,7 @@ export const StudentHomeScreen = ({ navigation }) => {
             onPress={() => navigation.navigate('Drills')}
           >
             <View style={styles.sproutChip}>
-              <Text style={styles.sproutChipText}>02 · Practice</Text>
+              <Text style={styles.sproutChipText}>Practice</Text>
             </View>
             <Text style={styles.gridTitle}>Virtual Drills</Text>
             <Text style={styles.gridSub}>Interactive scenarios</Text>
