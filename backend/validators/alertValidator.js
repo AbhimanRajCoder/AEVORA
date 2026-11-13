@@ -22,7 +22,7 @@ export const validateAlertCreation = (req, res, next) => {
     return sendError(res, 'Alert message is required and must be a valid text string', 400);
   }
 
-  if (severity && !VALID_SEVERITIES.includes(severity.toLowerCase())) {
+  if (severity != null && (typeof severity !== 'string' || !VALID_SEVERITIES.includes(severity.toLowerCase()))) {
     return sendError(
       res,
       `Invalid severity level. Allowed values: ${VALID_SEVERITIES.join(', ')}`,
