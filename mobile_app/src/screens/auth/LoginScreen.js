@@ -72,11 +72,7 @@ export const LoginScreen = ({ navigation }) => {
           </Text>
         </View>
 
-        <Text style={styles.heroTitle}>
-          Be{"\n"}
-          ready{"\n"}
-          <Text style={styles.sproutText}>now.</Text>
-        </Text>
+        <Text style={styles.heroTitle}>Campus sign-in</Text>
         <Text style={styles.heroSubtitle}>
           Interactive disaster modules, server-graded quizzes, and campus
           emergency drills.
