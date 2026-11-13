@@ -60,10 +60,10 @@ export const formatAuthResponse = (session, authUser, profile) => ({
  * @param {object} payload - Signup fields (full_name, email, password, institution_id, role).
  * @returns {Promise<object>} Session tokens and user profile.
  */
-export const signupUser = async ({ full_name, email, password, institution_id, role }) => {
+export const signupUser = async ({ full_name, email, password, institution_id }) => {
   const normalizedEmail = email.trim().toLowerCase();
   const normalizedName = full_name.trim();
-  const normalizedRole = role ? role.toLowerCase() : 'student';
+  const normalizedRole = 'student';
   const resolvedInstitutionId = await resolveInstitutionId(institution_id);
 
   const { data: createdData, error: createError } = await supabase.auth.admin.createUser({

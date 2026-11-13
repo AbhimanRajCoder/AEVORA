@@ -4,7 +4,7 @@ import { sendError } from '../utils/responseHelper.js';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const ALLOWED_ROLES = ['student', 'admin'];
+const ALLOWED_ROLES = ['student'];
 const MIN_PASSWORD_LENGTH = 6;
 
 /**
