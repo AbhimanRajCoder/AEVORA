@@ -1,6 +1,6 @@
 // Login screen in Forest Depths dark canvas with password reveal toggle and keyboard chaining.
 
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -10,38 +10,41 @@ import {
   Text,
   TextInput,
   View,
-} from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useAuth } from '../../context/AuthContext';
-import { AtmosphericOrb } from '../../components/AtmosphericOrb';
-import { PrimaryButton } from '../../components/PrimaryButton';
-import { GoogleSignInButton } from '../../components/GoogleSignInButton';
-import { COLORS, FONTS, RADIUS, SPACING, TYPE } from '../../constants/theme';
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAuth } from "../../context/AuthContext";
+import { AtmosphericOrb } from "../../components/AtmosphericOrb";
+import { PrimaryButton } from "../../components/PrimaryButton";
+import { GoogleSignInButton } from "../../components/GoogleSignInButton";
+import { COLORS, FONTS, RADIUS, SPACING, TYPE } from "../../constants/theme";
 
 export const LoginScreen = ({ navigation }) => {
   const insets = useSafeAreaInsets();
   const { signIn } = useAuth();
   const passwordRef = useRef(null);
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [focusedField, setFocusedField] = useState(null);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleLogin = async () => {
     if (!email.trim() || !password) {
-      setError('Please enter both email and password.');
+      setError("Please enter both email and password.");
       return;
     }
-
-    setError('');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      setError("Enter a valid email address, like student@institution.edu.");
+      return;
+    }
+    setError("");
     setIsSubmitting(true);
     try {
       await signIn({ email: email.trim(), password });
     } catch (err) {
-      setError(err.message || 'Login failed. Please check your credentials.');
+      setError(err.message || "Login failed. Please check your credentials.");
     } finally {
       setIsSubmitting(false);
     }
@@ -50,13 +53,16 @@ export const LoginScreen = ({ navigation }) => {
   return (
     <KeyboardAvoidingView
       style={styles.canvas}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <AtmosphericOrb style={styles.orbTopRight} />
       <ScrollView
         contentContainerStyle={[
           styles.container,
-          { paddingTop: insets.top + SPACING.s32, paddingBottom: insets.bottom + SPACING.s32 },
+          {
+            paddingTop: insets.top + SPACING.s32,
+            paddingBottom: insets.bottom + SPACING.s32,
+          },
         ]}
         keyboardShouldPersistTaps="handled"
       >
@@ -67,24 +73,28 @@ export const LoginScreen = ({ navigation }) => {
         </View>
 
         <Text style={styles.heroTitle}>
-          Be{'\n'}
-          ready{'\n'}
+          Be{"\n"}
+          ready{"\n"}
           <Text style={styles.sproutText}>now.</Text>
         </Text>
         <Text style={styles.heroSubtitle}>
-          Interactive disaster modules, server-graded quizzes, and campus emergency drills.
+          Interactive disaster modules, server-graded quizzes, and campus
+          emergency drills.
         </Text>
 
         <View style={styles.darkPanel}>
           <Text style={styles.label}>EMAIL</Text>
           <TextInput
-            style={[styles.input, focusedField === 'email' && styles.inputFocused]}
+            style={[
+              styles.input,
+              focusedField === "email" && styles.inputFocused,
+            ]}
             value={email}
             onChangeText={(val) => {
               setEmail(val);
-              if (error) setError('');
+              if (error) setError("");
             }}
-            onFocus={() => setFocusedField('email')}
+            onFocus={() => setFocusedField("email")}
             onBlur={() => setFocusedField(null)}
             placeholder="student@institution.edu"
             placeholderTextColor={COLORS.lichenSage}
@@ -97,16 +107,21 @@ export const LoginScreen = ({ navigation }) => {
           />
 
           <Text style={styles.label}>PASSWORD</Text>
-          <View style={[styles.passwordRow, focusedField === 'password' && styles.inputFocused]}>
+          <View
+            style={[
+              styles.passwordRow,
+              focusedField === "password" && styles.inputFocused,
+            ]}
+          >
             <TextInput
               ref={passwordRef}
               style={styles.passwordInput}
               value={password}
               onChangeText={(val) => {
                 setPassword(val);
-                if (error) setError('');
+                if (error) setError("");
               }}
-              onFocus={() => setFocusedField('password')}
+              onFocus={() => setFocusedField("password")}
               onBlur={() => setFocusedField(null)}
               placeholder="Enter your password"
               placeholderTextColor={COLORS.lichenSage}
@@ -119,9 +134,13 @@ export const LoginScreen = ({ navigation }) => {
               onPress={() => setShowPassword((prev) => !prev)}
               hitSlop={8}
               accessibilityRole="button"
-              accessibilityLabel={showPassword ? 'Hide password' : 'Show password'}
+              accessibilityLabel={
+                showPassword ? "Hide password" : "Show password"
+              }
             >
-              <Text style={styles.toggleText}>{showPassword ? 'Hide' : 'Show'}</Text>
+              <Text style={styles.toggleText}>
+                {showPassword ? "Hide" : "Show"}
+              </Text>
             </Pressable>
           </View>
 
@@ -131,13 +150,21 @@ export const LoginScreen = ({ navigation }) => {
             </View>
           ) : null}
 
-          <PrimaryButton label="Sign In" onPress={handleLogin} isLoading={isSubmitting} />
+          <PrimaryButton
+            label="Sign In"
+            onPress={handleLogin}
+            isLoading={isSubmitting}
+          />
 
           <GoogleSignInButton onError={setError} disabled={isSubmitting} />
 
-          <Pressable onPress={() => navigation.navigate('Signup')} style={styles.linkRow}>
+          <Pressable
+            onPress={() => navigation.navigate("Signup")}
+            style={styles.linkRow}
+          >
             <Text style={styles.linkText}>
-              New to your campus? <Text style={styles.linkUnderline}>Create an account</Text>
+              New to your campus?{" "}
+              <Text style={styles.linkUnderline}>Create an account</Text>
             </Text>
           </Pressable>
         </View>
@@ -149,9 +176,13 @@ export const LoginScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   canvas: { flex: 1, backgroundColor: COLORS.forestDepths },
   orbTopRight: { top: -110, right: -90 },
-  container: { flexGrow: 1, justifyContent: 'center', paddingHorizontal: SPACING.s24 },
+  container: {
+    flexGrow: 1,
+    justifyContent: "center",
+    paddingHorizontal: SPACING.s24,
+  },
   announcementPill: {
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
     borderWidth: 1,
     borderColor: COLORS.lichenSage,
     borderRadius: RADIUS.orb,
@@ -161,8 +192,17 @@ const styles = StyleSheet.create({
   },
   announcementText: { ...TYPE.body, color: COLORS.pureWhite },
   sproutText: { color: COLORS.electricSprout },
-  heroTitle: { fontFamily: FONTS.display, ...TYPE.displayHero, color: COLORS.pureWhite, marginBottom: SPACING.s16 },
-  heroSubtitle: { ...TYPE.bodyMd, color: COLORS.paleFern, marginBottom: SPACING.s32 },
+  heroTitle: {
+    fontFamily: FONTS.display,
+    ...TYPE.displayHero,
+    color: COLORS.pureWhite,
+    marginBottom: SPACING.s16,
+  },
+  heroSubtitle: {
+    ...TYPE.bodyMd,
+    color: COLORS.paleFern,
+    marginBottom: SPACING.s32,
+  },
   darkPanel: {
     backgroundColor: COLORS.forestDepths,
     borderWidth: 1,
@@ -173,7 +213,7 @@ const styles = StyleSheet.create({
   label: {
     ...TYPE.caption,
     color: COLORS.paleFern,
-    fontWeight: '500',
+    fontWeight: "500",
     letterSpacing: 0.8,
     marginBottom: SPACING.s8,
   },
@@ -189,8 +229,8 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.s16,
   },
   passwordRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     borderWidth: 1,
     borderColor: COLORS.mossShadow,
     borderRadius: RADIUS.input,
@@ -206,7 +246,7 @@ const styles = StyleSheet.create({
   },
   toggleText: {
     ...TYPE.caption,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.electricSprout,
     marginLeft: SPACING.s8,
   },
@@ -220,7 +260,10 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.mossShadow,
   },
   errorText: { ...TYPE.body, color: COLORS.electricSprout },
-  linkRow: { marginTop: SPACING.s24, alignItems: 'center' },
+  linkRow: { marginTop: SPACING.s24, alignItems: "center" },
   linkText: { ...TYPE.body, color: COLORS.paleFern },
-  linkUnderline: { color: COLORS.electricSprout, textDecorationLine: 'underline' },
+  linkUnderline: {
+    color: COLORS.electricSprout,
+    textDecorationLine: "underline",
+  },
 });
