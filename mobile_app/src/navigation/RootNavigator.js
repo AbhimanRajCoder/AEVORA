@@ -7,12 +7,17 @@ import { LoadingState } from '../components/LoadingState';
 import { AuthNavigator } from './AuthNavigator';
 import { StudentNavigator } from './StudentNavigator';
 
+import { CampusDashboard } from '../screens/admin/CampusDashboard';
+import { ROLES } from '../constants/roles';
+
 export const RootNavigator = () => {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
 
   if (isLoading) {
     return <LoadingState dark message="Restoring session..." />;
   }
+
+  if (user?.role === ROLES.ADMIN) return <CampusDashboard />;
 
   return (
     <NavigationContainer>
