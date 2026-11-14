@@ -1,5 +1,6 @@
+import { FilterRow } from '../../components/ListControls';
 import React, { useEffect, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Card } from '../../components/Card';
 import { PrimaryButton } from '../../components/PrimaryButton';
@@ -23,6 +24,12 @@ function CampusForm({ alert }) {
   const [message, setMessage] = useState('');
   const label = alert ? 'Alert title' : 'Contact name';
   const detailLabel = alert ? 'Message for students' : 'Phone number';
+
+  function reviewAlert() {
+    Alert.alert(name.trim(), severity.toUpperCase() + ' · ' + detail.trim(), [
+      { text: 'Keep editing', style: 'cancel' }, { text: 'Publish to campus', onPress: submit },
+    ]);
+  }
 
   async function submit() {
     setBusy(true);
@@ -57,7 +64,7 @@ function CampusForm({ alert }) {
           <Text style={styles.optionText}>{value}</Text>
         </Pressable>
       ))}</View>}
-      <PrimaryButton label={alert ? 'Publish alert' : 'Save contact'} onPress={submit}
+      <PrimaryButton label={alert ? 'Review alert' : 'Save contact'} onPress={alert ? reviewAlert : submit}
         disabled={!name.trim() || !detail.trim()} isLoading={busy} />
       {!!message && <Text accessibilityLiveRegion="polite" style={styles.label}>{message}</Text>}
     </Card>
@@ -66,6 +73,7 @@ function CampusForm({ alert }) {
 
 export function CampusDashboard() {
   const { signOut } = useAuth();
+  const [section, setSection] = useState("Overview");
   const [stats, setStats] = useState(null);
   const [error, setError] = useState('');
   const [revision, setRevision] = useState(0);
@@ -86,7 +94,8 @@ export function CampusDashboard() {
         </View>
         <Text style={styles.title}>Campus readiness</Text>
         <Text style={styles.subtitle}>{stats?.institution_name || 'Administration'}</Text>
-        <Card>
+        <FilterRow value={section} options={["Overview", "Alerts", "Contacts"]} onChange={setSection} />
+        {section === "Overview" && <Card>
           {stats ? <>
             <Text style={styles.heading}>Preparedness score</Text>
             <Text style={styles.score}>{stats.preparedness_score}%</Text>
@@ -99,9 +108,9 @@ export function CampusDashboard() {
           </> : <Text>{error || 'Loading campus metrics…'}</Text>}
           {(stats || error) ? <PrimaryButton style={styles.refresh} variant="outlineLight"
             label="Refresh metrics" onPress={() => setRevision(value => value + 1)} /> : null}
-        </Card>
-        <CampusForm alert />
-        <CampusForm alert={false} />
+        </Card>}
+        <View style={section !== "Alerts" && {display:"none"}}><CampusForm alert /></View>
+        <View style={section !== "Contacts" && {display:"none"}}><CampusForm alert={false} /></View>
       </ScrollView>
     </SafeAreaView>
   );
