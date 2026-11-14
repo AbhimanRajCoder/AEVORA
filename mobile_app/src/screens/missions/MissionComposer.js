@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Text, TextInput, View} from 'react-native';
+import {Alert,Text, TextInput, View} from 'react-native';
 import {apiRequest} from '../../services/apiClient';
 import {PrimaryButton} from '../../components/PrimaryButton';
 import {s} from './missionStyles';
@@ -25,12 +25,17 @@ export function MissionComposer({onPublished}) {
     } catch(e) {setMessage(e.message);}
     finally {setBusy(false);}
   }
+  function preview() {
+    const steps = draft.steps.split('\n').map(x=>x.trim()).filter(Boolean);
+    const summary = [draft.brief, 'Due '+draft.due_on, ...steps.map((step,i)=>(i+1)+'. '+step)].join('\n');
+    Alert.alert(draft.title, summary, [{text:'Edit',style:'cancel'},{text:'Publish to campus',onPress:publish}]);
+  }
   return <View style={s.card}><Text style={s.title}>Assign a campus mission</Text>
     {fields.map(([key,label,maxLength]) => <View key={key}><Text style={s.body}>{label}</Text>
       <TextInput accessibilityLabel={label} style={s.input} value={draft[key]} editable={!busy}
         maxLength={maxLength} multiline={key === 'steps' || key === 'brief'}
         onChangeText={text => setDraft(previous => ({...previous,[key]:text}))} /></View>)}
-    <PrimaryButton label="Publish mission" onPress={publish} isLoading={busy} disabled={Object.values(draft).some(x=>!x.trim())}/>
+    <PrimaryButton label="Preview mission" onPress={preview} isLoading={busy} disabled={Object.values(draft).some(x=>!x.trim())}/>
     {!!message && <Text accessibilityLiveRegion="polite" style={s.body}>{message}</Text>}
   </View>;
 }
