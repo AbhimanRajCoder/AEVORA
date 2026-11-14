@@ -22,6 +22,7 @@ const dialPhone = (phone, label) => {
 
 export const EmergencyContactsScreen = () => {
   const [query, setQuery] = React.useState('');
+  const [scope, setScope] = React.useState('All');
   const [contactsData, setContactsData] = useState({ national_contacts: [], local_contacts: [] });
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -100,9 +101,9 @@ export const EmergencyContactsScreen = () => {
         />
       </Card>
 
-      <SearchField value={query} onChange={setQuery} label="Search directory" />
-      {renderSection('National', 'Helplines', matching(contactsData.national_contacts))}
-      {renderSection('Campus', 'Contacts', matching(contactsData.local_contacts))}
+      <SearchField value={query} onChange={setQuery} label="Search directory" /><FilterRow value={scope} options={['All', 'Campus', 'National']} onChange={setScope} />
+      {scope !== 'Campus' && renderSection('National', 'Helplines', matching(contactsData.national_contacts))}
+      {scope !== 'National' && renderSection('Campus', 'Contacts', matching(contactsData.local_contacts))}
     </ScrollView>
   );
 };
