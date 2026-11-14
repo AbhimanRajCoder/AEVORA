@@ -1,5 +1,6 @@
 // Virtual drills list screen displaying interactive emergency decision scenarios.
 
+import { SearchField, FilterRow } from '../../components/ListControls';
 import React, { useCallback, useState } from 'react';
 import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
@@ -57,6 +58,7 @@ const DrillCard = ({ item, index, onPress }) => {
 
 // Displays all virtual drills fetched from the backend and routes to DrillSimulationScreen.
 export const DrillsListScreen = ({ navigation }) => {
+  const [query, setQuery] = React.useState('');
   const [drills, setDrills] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -90,12 +92,12 @@ export const DrillsListScreen = ({ navigation }) => {
     <FlatList
       style={styles.list}
       contentContainerStyle={styles.container}
-      data={drills}
+      data={drills.filter(item => item.title.toLowerCase().includes(query.trim().toLowerCase()))}
       keyExtractor={(item) => item.id}
       refreshControl={
         <RefreshControl refreshing={isRefreshing} onRefresh={() => loadDrills(true)} />
       }
-      ListHeaderComponent={drills.length > 0 ? <DrillsHeader count={drills.length} /> : null}
+      ListHeaderComponent={<><DrillsHeader count={drills.length} /><SearchField value={query} onChange={setQuery} label="Search scenarios" /></>}
       ListEmptyComponent={
         <EmptyState
           title="No virtual drills available"
