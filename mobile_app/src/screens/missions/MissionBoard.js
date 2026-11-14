@@ -23,10 +23,14 @@ export function MissionBoard({navigation}) {
   }, [revision]));
   const stateOf = row => row.checked?.length === row.tasks.length ? 'Finished' : row.checked?.length ? 'Started' : 'New';
   const visible = rows.filter(row => filter === 'All' || filter === stateOf(row));
+  const next = rows.find(row => stateOf(row) !== 'Finished');
   return <ScrollView style={s.page} contentContainerStyle={s.content}
     refreshControl={<RefreshControl refreshing={busy} onRefresh={() => reload(n => n + 1)} />}>
     <View style={s.hero}><Text style={s.heroTitle}>Campus missions</Text>
       <Text style={s.heroNote}>Your campus preparedness assignments, ordered by deadline.</Text></View>
+    {next && <View style={s.card}><Text style={s.meta}>Next assignment</Text>
+      <Text style={s.title}>{next.title}</Text><Text style={s.body}>{next.tasks.find((_,i) => !next.checked?.includes(i))}</Text>
+      <PrimaryButton label="Continue assignment" onPress={()=>navigation.navigate('MissionDetail',{mission:next})}/></View>}
     {!!error && <View style={s.card}><Text style={s.error}>{error}</Text>
       <PrimaryButton label="Retry" onPress={() => reload(n => n + 1)} /></View>}
     {!busy && !error && !rows.length && <Text style={s.body}>Your campus has no assignments yet.</Text>}
