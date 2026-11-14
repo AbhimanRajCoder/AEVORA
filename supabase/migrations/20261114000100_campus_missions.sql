@@ -11,3 +11,15 @@ CREATE INDEX IF NOT EXISTS missions_agenda ON public.campus_missions(institution
 ALTER TABLE public.campus_missions ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON public.campus_missions FROM anon, authenticated;
 GRANT SELECT, INSERT ON public.campus_missions TO service_role;
+
+CREATE TABLE IF NOT EXISTS public.mission_checks (
+  mission_id uuid NOT NULL REFERENCES public.campus_missions(id) ON DELETE CASCADE,
+  student_id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  task_index integer NOT NULL CHECK (task_index BETWEEN 0 AND 11),
+  checked_at timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY (mission_id, student_id, task_index)
+);
+ALTER TABLE public.mission_checks ENABLE ROW LEVEL SECURITY;
+REVOKE ALL ON public.mission_checks FROM anon, authenticated;
+GRANT SELECT, INSERT, DELETE ON public.mission_checks TO service_role;
+CREATE INDEX IF NOT EXISTS mission_checks_student ON public.mission_checks(student_id, mission_id);
