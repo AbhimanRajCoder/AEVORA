@@ -88,7 +88,7 @@ export function CampusDashboard() {
   useEffect(() => {
     let active = true;
     setError('');
-    setStats(null);
+
     apiRequest('/dashboard').then(data => { if (active) setStats(data); })
       .catch(err => { if (active) setError(err.message); });
     return () => { active = false; };
@@ -114,6 +114,7 @@ export function CampusDashboard() {
               <ProgressBar percentage={stats[key]} />
             </View>)}
           </> : <Text>{error || 'Loading campus metrics…'}</Text>}
+          {stats && !!error && <Text accessibilityLiveRegion="polite">{error}</Text>}
           {(stats || error) ? <PrimaryButton style={styles.refresh} variant="outlineLight"
             label="Refresh metrics" onPress={() => setRevision(value => value + 1)} /> : null}
         </Card>}

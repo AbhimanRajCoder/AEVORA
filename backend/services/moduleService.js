@@ -15,7 +15,8 @@ export const getAllModules = async (userId) => {
 
   if (modulesError) throw modulesError;
 
-  const { data: lessons } = await supabase.from('lessons').select('id, module_id');
+  const { data: lessons, error: lessonsError } = await supabase.from('lessons').select('id, module_id');
+  if (lessonsError) throw lessonsError;
   const { data: progress } = await supabase
     .from('lesson_progress')
     .select('lesson_id')
