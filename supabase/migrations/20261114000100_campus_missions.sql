@@ -42,3 +42,21 @@ LANGUAGE sql STABLE SECURITY INVOKER SET search_path = '' AS $$
 $$;
 REVOKE ALL ON FUNCTION public.mission_participation(uuid) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.mission_participation(uuid) TO service_role;
+
+-- Checklist positions are zero-based in the API and one-based in PostgreSQL arrays.
+CREATE OR REPLACE FUNCTION public.validate_mission_check()
+RETURNS trigger LANGUAGE plpgsql SECURITY INVOKER SET search_path = '' AS $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM public.campus_missions m JOIN public.profiles p
+    ON p.institution_id = m.institution_id
+    WHERE m.id = NEW.mission_id AND p.id = NEW.student_id AND p.role = 'student'
+    AND NEW.task_index >= 0 AND NEW.task_index < cardinality(m.tasks)
+  ) THEN RAISE EXCEPTION 'Invalid student or checklist position' USING ERRCODE='23514';
+  END IF;
+  RETURN NEW;
+END;
+$$;
+DROP TRIGGER IF EXISTS validate_mission_check ON public.mission_checks;
+CREATE TRIGGER validate_mission_check BEFORE INSERT OR UPDATE ON public.mission_checks
+FOR EACH ROW EXECUTE FUNCTION public.validate_mission_check();
