@@ -8,6 +8,7 @@ import { useAuth } from '../../context/AuthContext';
 import { getModules } from '../../services/moduleService';
 import { getAlerts } from '../../services/alertService';
 import { AtmosphericOrb } from '../../components/AtmosphericOrb';
+import { PrimaryButton } from '../../components/PrimaryButton';
 import { Card } from '../../components/Card';
 import { ProgressBar } from '../../components/ProgressBar';
 import { SeverityBadge } from '../../components/SeverityBadge';
@@ -107,6 +108,8 @@ export const StudentHomeScreen = ({ navigation }) => {
           Welcome back, {user?.full_name || 'Student'}. Track modules and practice drills.
         </Text>
 
+        {modules.length > 0 && completedModules === modules.length && <PrimaryButton label="Practice a drill"
+          onPress={() => navigation.navigate('Drills')} />}
         <Card variant="floating" style={styles.floatingCard}>
           <View style={styles.floatingTop}>
             <View style={styles.sproutChip}>

@@ -32,6 +32,14 @@ function CampusForm({ alert }) {
   }
 
   async function submit() {
+    if (!alert && !/^[+0-9 ()-]+$/.test(detail.trim())) {
+      setMessage('Use digits and an optional country or area code.');
+      return;
+    }
+    if (!alert && !/\d{3}/.test(detail.replace(/\D/g, ''))) {
+      setMessage('Enter a phone number with at least three digits.');
+      return;
+    }
     setBusy(true);
     setMessage('');
     try {
