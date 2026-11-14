@@ -1,5 +1,6 @@
 // Emergency Contacts screen with SOS 112 quick-dial banner and one-tap call actions.
 
+import { SearchField, FilterRow } from '../../components/ListControls';
 import React, { useCallback, useState } from 'react';
 import { Alert, Linking, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
@@ -20,6 +21,7 @@ const dialPhone = (phone, label) => {
 };
 
 export const EmergencyContactsScreen = () => {
+  const [query, setQuery] = React.useState('');
   const [contactsData, setContactsData] = useState({ national_contacts: [], local_contacts: [] });
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -49,6 +51,7 @@ export const EmergencyContactsScreen = () => {
   if (isLoading) return <LoadingState message="Loading emergency contacts..." />;
   if (error) return <ErrorState message={error} onRetry={() => loadContacts()} />;
 
+  const matching = rows => (rows || []).filter(row => (row.name + " " + row.phone).toLowerCase().includes(query.trim().toLowerCase()));
   const renderSection = (title, accent, items) => (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>
@@ -97,8 +100,9 @@ export const EmergencyContactsScreen = () => {
         />
       </Card>
 
-      {renderSection('National', 'Helplines', contactsData.national_contacts || [])}
-      {renderSection('Campus', 'Contacts', contactsData.local_contacts || [])}
+      <SearchField value={query} onChange={setQuery} label="Search directory" />
+      {renderSection('National', 'Helplines', matching(contactsData.national_contacts))}
+      {renderSection('Campus', 'Contacts', matching(contactsData.local_contacts))}
     </ScrollView>
   );
 };
