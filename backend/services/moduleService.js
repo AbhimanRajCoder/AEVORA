@@ -17,11 +17,12 @@ export const getAllModules = async (userId) => {
 
   const { data: lessons, error: lessonsError } = await supabase.from('lessons').select('id, module_id');
   if (lessonsError) throw lessonsError;
-  const { data: progress } = await supabase
+  const { data: progress, error: progressError } = await supabase
     .from('lesson_progress')
     .select('lesson_id')
     .eq('user_id', userId);
 
+  if (progressError) throw progressError;
   const completedSet = new Set((progress || []).map((p) => p.lesson_id));
 
   return (modules || []).map((module) => {
@@ -53,7 +54,8 @@ export const getModuleById = async (moduleId, userId) => {
     .eq('id', moduleId)
     .single();
 
-  if (moduleError || !moduleData) {
+  if (moduleError && moduleError.code !== 'PGRST116') throw moduleError;
+  if (!moduleData) {
     const notFoundError = new Error('Learning module not found');
     notFoundError.statusCode = 404;
     throw notFoundError;
@@ -68,12 +70,13 @@ export const getModuleById = async (moduleId, userId) => {
   if (lessonsError) throw lessonsError;
 
   const lessonIds = (lessons || []).map((l) => l.id);
-  const { data: progress } = await supabase
+  const { data: progress, error: progressError } = await supabase
     .from('lesson_progress')
     .select('lesson_id')
     .eq('user_id', userId)
     .in('lesson_id', lessonIds);
 
+  if (progressError) throw progressError;
   const completedSet = new Set((progress || []).map((p) => p.lesson_id));
   const lessonsWithStatus = (lessons || []).map((lesson) => ({
     ...lesson,
