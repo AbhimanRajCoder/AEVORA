@@ -59,6 +59,7 @@ const DrillCard = ({ item, index, onPress }) => {
 // Displays all virtual drills fetched from the backend and routes to DrillSimulationScreen.
 export const DrillsListScreen = ({ navigation }) => {
   const [query, setQuery] = React.useState('');
+  const [order, setOrder] = React.useState('Catalogue');
   const [drills, setDrills] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -92,12 +93,12 @@ export const DrillsListScreen = ({ navigation }) => {
     <FlatList
       style={styles.list}
       contentContainerStyle={styles.container}
-      data={drills.filter(item => item.title.toLowerCase().includes(query.trim().toLowerCase()))}
+      data={drills.filter(item => item.title.toLowerCase().includes(query.trim().toLowerCase())).sort((a,b) => order === 'Shortest first' ? a.total_steps - b.total_steps : 0)}
       keyExtractor={(item) => item.id}
       refreshControl={
         <RefreshControl refreshing={isRefreshing} onRefresh={() => loadDrills(true)} />
       }
-      ListHeaderComponent={<><DrillsHeader count={drills.length} /><SearchField value={query} onChange={setQuery} label="Search scenarios" /></>}
+      ListHeaderComponent={<><DrillsHeader count={drills.length} /><SearchField value={query} onChange={setQuery} label="Search scenarios" /><FilterRow value={order} options={['Catalogue', 'Shortest first']} onChange={setOrder} /></>}
       ListEmptyComponent={
         <EmptyState
           title="No virtual drills available"
