@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {Alert,Text, TextInput, View} from 'react-native';
 import {apiRequest} from '../../services/apiClient';
 import {PrimaryButton} from '../../components/PrimaryButton';
@@ -13,7 +13,10 @@ export function MissionComposer({onPublished}) {
   const [draft,setDraft] = useState(blank);
   const [busy,setBusy] = useState(false);
   const [message,setMessage] = useState('');
+  const publishing = useRef(false);
   async function publish() {
+    if (publishing.current) return;
+    publishing.current = true;
     setBusy(true);
     setMessage('');
     try {
@@ -23,7 +26,7 @@ export function MissionComposer({onPublished}) {
       setMessage('Mission published to your campus.');
       onPublished?.();
     } catch(e) {setMessage(e.message);}
-    finally {setBusy(false);}
+    finally {publishing.current=false; setBusy(false);}
   }
   function preview() {
     const steps = draft.steps.split('\n').map(x=>x.trim()).filter(Boolean);
