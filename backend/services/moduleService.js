@@ -65,7 +65,8 @@ export const getModuleById = async (moduleId, userId) => {
     .from('lessons')
     .select('id, title, content, image_url, created_at')
     .eq('module_id', moduleId)
-    .order('created_at', { ascending: true });
+    .order('created_at', { ascending: true })
+    .order('id', { ascending: true });
 
   if (lessonsError) throw lessonsError;
 

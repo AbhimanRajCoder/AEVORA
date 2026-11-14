@@ -29,7 +29,8 @@ export const getInstitutionLeaderboard = async (
     .select('id, full_name, points')
     .eq('institution_id', institutionId)
     .eq('role', 'student')
-    .order('points', { ascending: false });
+    .order('points', { ascending: false })
+    .order('id', { ascending: true });
 
   if (error) throw error;
 
