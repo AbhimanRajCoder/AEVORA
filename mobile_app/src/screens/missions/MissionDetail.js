@@ -28,10 +28,10 @@ export function MissionDetail({route}) {
     {checked.length === mission.tasks.length && <View style={s.card}><Text style={s.meta}>COMPLETED</Text>
       <Text style={s.title}>Mission complete</Text><Text style={s.body}>All {mission.tasks.length} tasks are recorded for your campus.</Text></View>}
     <View style={s.card}><Text style={s.title}>Field checklist</Text>
-      <Text style={s.meta}>{checked.length} of {mission.tasks.length} completed</Text>
+      <Text accessibilityLiveRegion="polite" style={s.meta}>{checked.length} of {mission.tasks.length} completed</Text>
       <ProgressBar percentage={100 * checked.length / mission.tasks.length} />
       {mission.tasks.map((task,i) => <Pressable key={i} accessibilityRole="checkbox"
-        accessibilityLabel={task} accessibilityState={{checked:checked.includes(i), disabled:pending !== null}}
+        accessibilityLabel={task} accessibilityHint={checked.includes(i) ? 'Mark this task incomplete' : 'Mark this task complete'} accessibilityState={{checked:checked.includes(i), disabled:pending !== null, busy:pending === i}}
         disabled={pending !== null} style={s.task} onPress={() => toggle(i)}>
         <Text style={s.circle}>{pending === i ? '…' : checked.includes(i) ? '☑' : '□'}</Text>
         <Text style={[s.body,s.grow]}>{task}</Text></Pressable>)}
