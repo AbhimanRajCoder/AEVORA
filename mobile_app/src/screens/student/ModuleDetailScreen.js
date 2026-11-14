@@ -49,6 +49,7 @@ export const ModuleDetailScreen = ({ route, navigation }) => {
 
   const lessons = moduleData?.lessons || [];
 
+  const nextIndex = lessons.findIndex(item => !item.is_completed);
   return (
     <ScrollView
       style={styles.screen}
@@ -74,6 +75,9 @@ export const ModuleDetailScreen = ({ route, navigation }) => {
           </Text>
         </View>
 
+        {nextIndex >= 0 && <PrimaryButton label="Open next lesson" variant="outlineDark"
+          onPress={() => navigation.navigate('LessonReader', { lesson: lessons[nextIndex], lessons,
+            lessonIndex: nextIndex, moduleId, moduleTitle: moduleData.title })} />}
         <PrimaryButton
           label="Take Module Quiz"
           onPress={() =>
