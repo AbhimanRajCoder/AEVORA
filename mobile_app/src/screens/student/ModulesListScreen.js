@@ -31,6 +31,7 @@ const DISASTER_FILTERS = [
 
 export const ModulesListScreen = ({ navigation }) => {
   const [query, setQuery] = React.useState('');
+  const [status, setStatus] = React.useState('All lessons');
   const [modules, setModules] = useState([]);
   const [selectedType, setSelectedType] = useState('all');
   const [isLoading, setIsLoading] = useState(true);
@@ -94,10 +95,11 @@ export const ModulesListScreen = ({ navigation }) => {
         </ScrollView>
       </View>
 
+      <FilterRow value={status} options={['All lessons', 'Unfinished', 'Completed']} onChange={setStatus} />
       <FlatList
         style={styles.list}
         contentContainerStyle={styles.container}
-        data={filteredModules.filter(item => item.title.toLowerCase().includes(query.trim().toLowerCase()))}
+        data={filteredModules.filter(item => (status === 'All lessons' || item.is_completed === (status === 'Completed')) && item.title.toLowerCase().includes(query.trim().toLowerCase()))}
         keyExtractor={(item) => item.id}
         refreshControl={
           <RefreshControl refreshing={isRefreshing} onRefresh={() => loadModules(true)} />
