@@ -87,13 +87,16 @@ export function CampusDashboard() {
   const [section, setSection] = useState("Overview");
   const [stats, setStats] = useState(null);
   const [error, setError] = useState('');
+  const [refreshing,setRefreshing] = useState(false);
   const [revision, setRevision] = useState(0);
   useEffect(() => {
     let active = true;
     setError('');
 
+    setRefreshing(true);
     apiRequest('/dashboard').then(data => { if (active) setStats(data); })
-      .catch(err => { if (active) setError(err.message); });
+      .catch(err => { if (active) setError(err.message); })
+      .finally(() => { if (active) setRefreshing(false); });
     return () => { active = false; };
   }, [revision]);
   return (
@@ -119,7 +122,7 @@ export function CampusDashboard() {
           </> : <Text>{error || 'Loading campus metrics…'}</Text>}
           {stats && !!error && <Text accessibilityLiveRegion="polite">{error}</Text>}
           {(stats || error) ? <PrimaryButton style={styles.refresh} variant="outlineLight"
-            label="Refresh metrics" onPress={() => setRevision(value => value + 1)} /> : null}
+            isLoading={refreshing} label="Refresh metrics" onPress={() => setRevision(value => value + 1)} /> : null}
         </Card>}
         {section === "Missions" && <View style={{gap:16}}><MissionReport revision={missionRevision} /><MissionComposer onPublished={()=>refreshMissions(n=>n+1)} /></View>}
         <View style={section !== "Notices" && {display:"none"}}><CampusForm alert /></View>
