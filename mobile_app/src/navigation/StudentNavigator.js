@@ -4,6 +4,8 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { FloatingPillTabBar } from '../components/FloatingPillTabBar';
+import { MissionDetail } from '../screens/missions/MissionDetail';
+import { MissionBoard } from '../screens/missions/MissionBoard';
 import { StudentHomeScreen } from '../screens/student/StudentHomeScreen';
 import { ModulesListScreen } from '../screens/student/ModulesListScreen';
 import { ModuleDetailScreen } from '../screens/student/ModuleDetailScreen';
@@ -69,6 +71,8 @@ export const StudentNavigator = () => (
       component={StudentTabs}
       options={{ headerShown: false }}
     />
+    <Stack.Screen name="MissionDetail" component={MissionDetail} options={{title:"Mission checklist"}} />
+    <Stack.Screen name="MissionBoard" component={MissionBoard} options={{ title: "Campus missions" }} />
     <Stack.Screen
       name="ModuleDetail"
       component={ModuleDetailScreen}

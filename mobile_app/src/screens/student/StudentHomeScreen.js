@@ -8,6 +8,7 @@ import { useAuth } from '../../context/AuthContext';
 import { getModules } from '../../services/moduleService';
 import { getAlerts } from '../../services/alertService';
 import { AtmosphericOrb } from '../../components/AtmosphericOrb';
+import { PrimaryButton } from '../../components/PrimaryButton';
 import { Card } from '../../components/Card';
 import { ProgressBar } from '../../components/ProgressBar';
 import { SeverityBadge } from '../../components/SeverityBadge';
@@ -34,7 +35,7 @@ export const StudentHomeScreen = ({ navigation }) => {
   const loadHomeData = useCallback(
     async (refresh = false) => {
       if (refresh) setIsRefreshing(true);
-      else if (modules.length === 0) setIsLoading(true);
+      else setIsLoading(true);
       setError('');
       try {
         const [modulesRes, alertsRes] = await Promise.all([
@@ -51,7 +52,7 @@ export const StudentHomeScreen = ({ navigation }) => {
         setIsRefreshing(false);
       }
     },
-    [modules.length, refreshUser]
+    [refreshUser]
   );
 
   useFocusEffect(
@@ -63,6 +64,7 @@ export const StudentHomeScreen = ({ navigation }) => {
   if (isLoading) return <LoadingState dark message="Loading workspace..." />;
   if (error) return <ErrorState message={error} onRetry={() => loadHomeData()} />;
 
+  const resume = modules.find(item => item.completed_lessons > 0 && !item.is_completed);
   const completedModules = modules.filter((m) => m.is_completed).length;
   const overallProgress =
     modules.length > 0
@@ -101,15 +103,13 @@ export const StudentHomeScreen = ({ navigation }) => {
           </Pressable>
         </View>
 
-        <Text style={styles.heroHeadline}>
-          Stay{'\n'}
-          safe <Text style={styles.sproutAccent}>all</Text>{'\n'}
-          semester.
-        </Text>
+        <Text style={styles.heroHeadline}>Student dashboard</Text>
         <Text style={styles.heroSubcopy}>
           Welcome back, {user?.full_name || 'Student'}. Track modules and practice drills.
         </Text>
 
+        {modules.length > 0 && completedModules === modules.length && <PrimaryButton label="Practice a drill"
+          onPress={() => navigation.navigate('Drills')} />}
         <Card variant="floating" style={styles.floatingCard}>
           <View style={styles.floatingTop}>
             <View style={styles.sproutChip}>
@@ -145,11 +145,11 @@ export const StudentHomeScreen = ({ navigation }) => {
             <Card variant="light">
               <View style={styles.alertRow}>
                 <View style={styles.sproutChip}>
-                  <Text style={styles.sproutChipText}>ALL CLEAR</Text>
+                  <Text style={styles.sproutChipText}>CAMPUS ALERTS</Text>
                 </View>
                 <Text style={styles.viewAllLink}>Alerts →</Text>
               </View>
-              <Text style={styles.cardTitle}>No active campus emergencies</Text>
+              <Text style={styles.cardTitle}>No campus alerts posted</Text>
               <Text style={styles.cardBody}>
                 Tap here anytime to view published institution safety advisories.
               </Text>
@@ -157,6 +157,13 @@ export const StudentHomeScreen = ({ navigation }) => {
           )}
         </Pressable>
 
+        <Pressable accessibilityRole="button" onPress={() => navigation.navigate('MissionBoard')}>
+          <Card><Text style={styles.cardTitle}>Campus missions →</Text>
+            <Text style={styles.cardBody}>View assignments and track your checklist.</Text></Card>
+        </Pressable>
+        {resume && <Pressable accessibilityRole="button" onPress={() => navigation.navigate('ModuleDetail', { moduleId: resume.id })}>
+          <Card><Text style={styles.cardTitle}>Continue learning</Text><Text style={styles.cardBody}>{resume.title}</Text></Card>
+        </Pressable>}
         <Text style={styles.sectionHeading}>
           Quick <Text style={styles.deepVerdantAccent}>actions</Text>
         </Text>
@@ -167,7 +174,7 @@ export const StudentHomeScreen = ({ navigation }) => {
             onPress={() => navigation.navigate('Modules')}
           >
             <View style={styles.sproutChip}>
-              <Text style={styles.sproutChipText}>01 · Learn</Text>
+              <Text style={styles.sproutChipText}>Learn</Text>
             </View>
             <Text style={styles.gridTitle}>Modules</Text>
             <Text style={styles.gridSub}>{modules.length} safety courses</Text>
@@ -178,7 +185,7 @@ export const StudentHomeScreen = ({ navigation }) => {
             onPress={() => navigation.navigate('Drills')}
           >
             <View style={styles.sproutChip}>
-              <Text style={styles.sproutChipText}>02 · Practice</Text>
+              <Text style={styles.sproutChipText}>Practice</Text>
             </View>
             <Text style={styles.gridTitle}>Virtual Drills</Text>
             <Text style={styles.gridSub}>Interactive scenarios</Text>

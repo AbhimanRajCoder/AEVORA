@@ -1,5 +1,6 @@
 // Modules list screen with disaster_type filter chips, progress bars, completion badges, and detail navigation.
 
+import { SearchField, FilterRow } from '../../components/ListControls';
 import React, { useCallback, useMemo, useState } from 'react';
 import {
   FlatList,
@@ -29,6 +30,8 @@ const DISASTER_FILTERS = [
 ];
 
 export const ModulesListScreen = ({ navigation }) => {
+  const [query, setQuery] = React.useState('');
+  const [status, setStatus] = React.useState('All lessons');
   const [modules, setModules] = useState([]);
   const [selectedType, setSelectedType] = useState('all');
   const [isLoading, setIsLoading] = useState(true);
@@ -68,6 +71,7 @@ export const ModulesListScreen = ({ navigation }) => {
 
   return (
     <View style={styles.screen}>
+      <SearchField value={query} onChange={setQuery} label="Search modules" />
       <View style={styles.filterBar}>
         <ScrollView
           horizontal
@@ -91,10 +95,11 @@ export const ModulesListScreen = ({ navigation }) => {
         </ScrollView>
       </View>
 
+      <FilterRow value={status} options={['All lessons', 'Unfinished', 'Completed']} onChange={setStatus} />
       <FlatList
         style={styles.list}
         contentContainerStyle={styles.container}
-        data={filteredModules}
+        data={filteredModules.filter(item => (status === 'All lessons' || item.is_completed === (status === 'Completed')) && item.title.toLowerCase().includes(query.trim().toLowerCase()))}
         keyExtractor={(item) => item.id}
         refreshControl={
           <RefreshControl refreshing={isRefreshing} onRefresh={() => loadModules(true)} />

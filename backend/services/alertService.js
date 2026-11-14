@@ -16,7 +16,8 @@ export const getAlertsByInstitutionId = async (institutionId) => {
     .from('alerts')
     .select('id, institution_id, title, message, severity, created_at')
     .eq('institution_id', institutionId)
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: false })
+    .order('id', { ascending: true });
 
   if (error) throw error;
   return alerts || [];

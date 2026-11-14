@@ -134,6 +134,8 @@ export const QuizScreen = ({ route, navigation }) => {
 
       {/* Band 2: Pure White Options & Navigation */}
       <View style={styles.lightBand}>
+        {!allAnswered && currentChoice && <PrimaryButton label="Next unanswered question" variant="outlineLight"
+          onPress={() => setCurrentIndex(questions.findIndex(item => !selectedAnswers[item.id]))} />}
         {(currentQuestion.options || []).map((option, idx) => {
           const isSelected = currentChoice === option;
           return (

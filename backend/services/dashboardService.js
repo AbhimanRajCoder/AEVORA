@@ -14,11 +14,12 @@ export const getAdminDashboardStats = async (institutionId) => {
     throw error;
   }
 
-  const { data: institution } = await supabase
+  const { data: institution, error: institutionError } = await supabase
     .from('institutions')
     .select('name')
     .eq('id', institutionId)
     .single();
+  if (institutionError) throw institutionError;
 
   const { data: students, error: studentsError } = await supabase
     .from('profiles')
@@ -43,26 +44,29 @@ export const getAdminDashboardStats = async (institutionId) => {
 
   const studentIds = students.map((s) => s.id);
 
-  const { count: totalLessonsCount } = await supabase
+  const { count: totalLessonsCount, error: totalLessonsCountError } = await supabase
     .from('lessons')
     .select('*', { count: 'exact', head: true });
+  if (totalLessonsCountError) throw totalLessonsCountError;
 
   const totalLessons = totalLessonsCount || 0;
   const maxPossibleLessonCompletions = totalStudents * totalLessons;
 
-  const { count: completedLessonsCount } = await supabase
+  const { count: completedLessonsCount, error: completedLessonsCountError } = await supabase
     .from('lesson_progress')
     .select('*', { count: 'exact', head: true })
     .in('user_id', studentIds);
+  if (completedLessonsCountError) throw completedLessonsCountError;
 
   const lessonCompletionRate = maxPossibleLessonCompletions > 0
     ? Math.min(100, Math.round(((completedLessonsCount || 0) / maxPossibleLessonCompletions) * 100))
     : 0;
 
-  const { data: quizAttempts } = await supabase
+  const { data: quizAttempts, error: quizAttemptsError } = await supabase
     .from('quiz_attempts')
     .select('score')
     .in('user_id', studentIds);
+  if (quizAttemptsError) throw quizAttemptsError;
 
   const quizScores = (quizAttempts || []).map((q) => Number(q.score));
   const totalQuizScore = quizScores.reduce((sum, score) => sum + score, 0);
@@ -70,10 +74,11 @@ export const getAdminDashboardStats = async (institutionId) => {
     ? Math.round(totalQuizScore / quizScores.length)
     : 0;
 
-  const { data: drillAttempts } = await supabase
+  const { data: drillAttempts, error: drillAttemptsError } = await supabase
     .from('drill_attempts')
     .select('user_id')
     .in('user_id', studentIds);
+  if (drillAttemptsError) throw drillAttemptsError;
 
   const participatingStudents = new Set((drillAttempts || []).map((d) => d.user_id));
   const drillParticipationRate = Math.min(

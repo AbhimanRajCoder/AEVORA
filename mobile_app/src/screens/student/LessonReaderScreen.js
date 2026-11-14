@@ -116,6 +116,8 @@ export const LessonReaderScreen = ({ route, navigation }) => {
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
         <View style={styles.actions}>
+          {isCompleted && !hasNextLesson && moduleId && <PrimaryButton label="Open module quiz"
+            onPress={() => navigation.navigate('Quiz', { moduleId, moduleTitle })} />}
           {!isCompleted ? (
             <PrimaryButton
               label="Mark as Complete"

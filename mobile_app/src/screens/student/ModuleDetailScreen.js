@@ -1,5 +1,6 @@
 // Module detail screen showing header, progress, interactive lessons list, and Take Module Quiz CTA.
 
+import { SearchField, FilterRow } from '../../components/ListControls';
 import React, { useCallback, useState } from 'react';
 import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
@@ -15,6 +16,7 @@ import { COLORS, FONTS, RADIUS, SPACING, TYPE } from '../../constants/theme';
 
 export const ModuleDetailScreen = ({ route, navigation }) => {
   const { moduleId } = route.params;
+  const [view, setView] = React.useState('All lessons');
   const [moduleData, setModuleData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -49,6 +51,7 @@ export const ModuleDetailScreen = ({ route, navigation }) => {
 
   const lessons = moduleData?.lessons || [];
 
+  const nextIndex = lessons.findIndex(item => !item.is_completed);
   return (
     <ScrollView
       style={styles.screen}
@@ -74,6 +77,9 @@ export const ModuleDetailScreen = ({ route, navigation }) => {
           </Text>
         </View>
 
+        {nextIndex >= 0 && <PrimaryButton label="Open next lesson" variant="outlineDark"
+          onPress={() => navigation.navigate('LessonReader', { lesson: lessons[nextIndex], lessons,
+            lessonIndex: nextIndex, moduleId, moduleTitle: moduleData.title })} />}
         <PrimaryButton
           label="Take Module Quiz"
           onPress={() =>
@@ -91,10 +97,12 @@ export const ModuleDetailScreen = ({ route, navigation }) => {
           Module <Text style={styles.accent}>Lessons</Text>
         </Text>
 
+        <FilterRow value={view} options={['All lessons', 'To finish']} onChange={setView} />
+        {view === "To finish" && nextIndex < 0 && lessons.length > 0 && <Text>All lessons completed.</Text>}
         {lessons.length === 0 ? (
           <EmptyState title="No lessons in this module yet" />
         ) : (
-          lessons.map((lesson, index) => (
+          lessons.map((lesson, index) => (view === "To finish" && lesson.is_completed) ? null : (
             <Pressable
               key={lesson.id}
               onPress={() =>

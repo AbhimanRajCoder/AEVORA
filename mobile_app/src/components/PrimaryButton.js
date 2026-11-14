@@ -31,6 +31,9 @@ export const PrimaryButton = ({
 
   return (
     <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityState={{ disabled: isInactive, busy: isLoading }}
       onPress={onPress}
       disabled={isInactive}
       style={({ pressed }) => [

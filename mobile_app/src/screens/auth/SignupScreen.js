@@ -1,6 +1,6 @@
 // Signup screen on Forest Depths canvas with campus directory loading, password reveal, and focus states.
 
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -11,14 +11,14 @@ import {
   Text,
   TextInput,
   View,
-} from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useAuth } from '../../context/AuthContext';
-import { getInstitutions } from '../../services/authService';
-import { AtmosphericOrb } from '../../components/AtmosphericOrb';
-import { PrimaryButton } from '../../components/PrimaryButton';
-import { GoogleSignInButton } from '../../components/GoogleSignInButton';
-import { COLORS, FONTS, RADIUS, SPACING, TYPE } from '../../constants/theme';
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAuth } from "../../context/AuthContext";
+import { getInstitutions } from "../../services/authService";
+import { AtmosphericOrb } from "../../components/AtmosphericOrb";
+import { PrimaryButton } from "../../components/PrimaryButton";
+import { GoogleSignInButton } from "../../components/GoogleSignInButton";
+import { COLORS, FONTS, RADIUS, SPACING, TYPE } from "../../constants/theme";
 
 export const SignupScreen = ({ navigation }) => {
   const insets = useSafeAreaInsets();
@@ -26,21 +26,21 @@ export const SignupScreen = ({ navigation }) => {
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
 
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [focusedField, setFocusedField] = useState(null);
   const [institutions, setInstitutions] = useState([]);
   const [isLoadingInstitutions, setIsLoadingInstitutions] = useState(true);
-  const [institutionsError, setInstitutionsError] = useState('');
-  const [selectedInstitutionId, setSelectedInstitutionId] = useState('');
-  const [error, setError] = useState('');
+  const [institutionsError, setInstitutionsError] = useState("");
+  const [selectedInstitutionId, setSelectedInstitutionId] = useState("");
+  const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const loadInstitutions = useCallback(async () => {
     setIsLoadingInstitutions(true);
-    setInstitutionsError('');
+    setInstitutionsError("");
     try {
       const list = await getInstitutions();
       setInstitutions(list || []);
@@ -48,7 +48,7 @@ export const SignupScreen = ({ navigation }) => {
         setSelectedInstitutionId((prev) => prev || list[0].id);
       }
     } catch (err) {
-      setInstitutionsError(err.message || 'Unable to load institutions.');
+      setInstitutionsError(err.message || "Unable to load institutions.");
     } finally {
       setIsLoadingInstitutions(false);
     }
@@ -59,12 +59,22 @@ export const SignupScreen = ({ navigation }) => {
   }, [loadInstitutions]);
 
   const handleSignup = async () => {
-    if (!fullName.trim() || !email.trim() || password.length < 6) {
-      setError('Enter your full name, valid email, and password (min 6 characters).');
+    if (!fullName.trim()) {
+      setError("Enter your full name.");
       return;
     }
 
-    setError('');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      setError("Enter a valid email address, like student@institution.edu.");
+      return;
+    }
+
+    if (password.length < 6) {
+      setError("Use a password with at least 6 characters.");
+      return;
+    }
+
+    setError("");
     setIsSubmitting(true);
     try {
       await signUp({
@@ -74,7 +84,7 @@ export const SignupScreen = ({ navigation }) => {
         institution_id: selectedInstitutionId || undefined,
       });
     } catch (err) {
-      setError(err.message || 'Unable to create account.');
+      setError(err.message || "Unable to create account.");
     } finally {
       setIsSubmitting(false);
     }
@@ -83,13 +93,16 @@ export const SignupScreen = ({ navigation }) => {
   return (
     <KeyboardAvoidingView
       style={styles.canvas}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <AtmosphericOrb style={styles.orbBottomLeft} />
       <ScrollView
         contentContainerStyle={[
           styles.container,
-          { paddingTop: insets.top + SPACING.s24, paddingBottom: insets.bottom + SPACING.s32 },
+          {
+            paddingTop: insets.top + SPACING.s24,
+            paddingBottom: insets.bottom + SPACING.s32,
+          },
         ]}
         keyboardShouldPersistTaps="handled"
       >
@@ -103,13 +116,16 @@ export const SignupScreen = ({ navigation }) => {
         <View style={styles.darkPanel}>
           <Text style={styles.label}>FULL NAME</Text>
           <TextInput
-            style={[styles.input, focusedField === 'name' && styles.inputFocused]}
+            style={[
+              styles.input,
+              focusedField === "name" && styles.inputFocused,
+            ]}
             value={fullName}
             onChangeText={(val) => {
               setFullName(val);
-              if (error) setError('');
+              if (error) setError("");
             }}
-            onFocus={() => setFocusedField('name')}
+            onFocus={() => setFocusedField("name")}
             onBlur={() => setFocusedField(null)}
             placeholder="Aarav Sharma"
             placeholderTextColor={COLORS.lichenSage}
@@ -121,13 +137,16 @@ export const SignupScreen = ({ navigation }) => {
           <Text style={styles.label}>EMAIL</Text>
           <TextInput
             ref={emailRef}
-            style={[styles.input, focusedField === 'email' && styles.inputFocused]}
+            style={[
+              styles.input,
+              focusedField === "email" && styles.inputFocused,
+            ]}
             value={email}
             onChangeText={(val) => {
               setEmail(val);
-              if (error) setError('');
+              if (error) setError("");
             }}
-            onFocus={() => setFocusedField('email')}
+            onFocus={() => setFocusedField("email")}
             onBlur={() => setFocusedField(null)}
             placeholder="aarav@institution.edu"
             placeholderTextColor={COLORS.lichenSage}
@@ -140,16 +159,21 @@ export const SignupScreen = ({ navigation }) => {
           />
 
           <Text style={styles.label}>PASSWORD (MIN 6 CHARS)</Text>
-          <View style={[styles.passwordRow, focusedField === 'password' && styles.inputFocused]}>
+          <View
+            style={[
+              styles.passwordRow,
+              focusedField === "password" && styles.inputFocused,
+            ]}
+          >
             <TextInput
               ref={passwordRef}
               style={styles.passwordInput}
               value={password}
               onChangeText={(val) => {
                 setPassword(val);
-                if (error) setError('');
+                if (error) setError("");
               }}
-              onFocus={() => setFocusedField('password')}
+              onFocus={() => setFocusedField("password")}
               onBlur={() => setFocusedField(null)}
               placeholder="Create password"
               placeholderTextColor={COLORS.lichenSage}
@@ -163,7 +187,9 @@ export const SignupScreen = ({ navigation }) => {
               hitSlop={8}
               accessibilityRole="button"
             >
-              <Text style={styles.toggleText}>{showPassword ? 'Hide' : 'Show'}</Text>
+              <Text style={styles.toggleText}>
+                {showPassword ? "Hide" : "Show"}
+              </Text>
             </Pressable>
           </View>
 
@@ -172,11 +198,15 @@ export const SignupScreen = ({ navigation }) => {
             {isLoadingInstitutions ? (
               <View style={styles.instStatusRow}>
                 <ActivityIndicator size="small" color={COLORS.electricSprout} />
-                <Text style={styles.instStatusText}>Loading campus directory...</Text>
+                <Text style={styles.instStatusText}>
+                  Loading campus directory...
+                </Text>
               </View>
             ) : institutionsError ? (
               <View style={styles.instStatusRow}>
-                <Text style={styles.instStatusText}>Campus directory unavailable.</Text>
+                <Text style={styles.instStatusText}>
+                  Campus directory unavailable.
+                </Text>
                 <Pressable onPress={loadInstitutions}>
                   <Text style={styles.retryLink}>Retry</Text>
                 </Pressable>
@@ -188,17 +218,27 @@ export const SignupScreen = ({ navigation }) => {
                   <Pressable
                     key={inst.id}
                     onPress={() => setSelectedInstitutionId(inst.id)}
-                    style={[styles.instChip, isSelected && styles.instChipSelected]}
+                    style={[
+                      styles.instChip,
+                      isSelected && styles.instChipSelected,
+                    ]}
                   >
                     <View style={styles.instTextWrap}>
-                      <Text style={[styles.instName, isSelected && styles.instNameSelected]}>
+                      <Text
+                        style={[
+                          styles.instName,
+                          isSelected && styles.instNameSelected,
+                        ]}
+                      >
                         {inst.name}
                       </Text>
                       <Text style={styles.instLocation}>
                         {inst.district}, {inst.state}
                       </Text>
                     </View>
-                    {isSelected ? <Text style={styles.instCheck}>✓</Text> : null}
+                    {isSelected ? (
+                      <Text style={styles.instCheck}>✓</Text>
+                    ) : null}
                   </Pressable>
                 );
               })
@@ -211,7 +251,11 @@ export const SignupScreen = ({ navigation }) => {
             </View>
           ) : null}
 
-          <PrimaryButton label="Create Account" onPress={handleSignup} isLoading={isSubmitting} />
+          <PrimaryButton
+            label="Create Account"
+            onPress={handleSignup}
+            isLoading={isSubmitting}
+          />
 
           <GoogleSignInButton
             institutionId={selectedInstitutionId || undefined}
@@ -221,7 +265,8 @@ export const SignupScreen = ({ navigation }) => {
 
           <Pressable onPress={() => navigation.goBack()} style={styles.linkRow}>
             <Text style={styles.linkText}>
-              Already registered? <Text style={styles.linkUnderline}>Sign In</Text>
+              Already registered?{" "}
+              <Text style={styles.linkUnderline}>Sign In</Text>
             </Text>
           </Pressable>
         </View>
@@ -233,10 +278,23 @@ export const SignupScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   canvas: { flex: 1, backgroundColor: COLORS.forestDepths },
   orbBottomLeft: { bottom: -120, left: -100 },
-  container: { flexGrow: 1, justifyContent: 'center', paddingHorizontal: SPACING.s24 },
-  heroTitle: { fontFamily: FONTS.display, ...TYPE.display, color: COLORS.pureWhite, marginBottom: SPACING.s8 },
+  container: {
+    flexGrow: 1,
+    justifyContent: "center",
+    paddingHorizontal: SPACING.s24,
+  },
+  heroTitle: {
+    fontFamily: FONTS.display,
+    ...TYPE.display,
+    color: COLORS.pureWhite,
+    marginBottom: SPACING.s8,
+  },
   sproutText: { color: COLORS.electricSprout },
-  heroSubtitle: { ...TYPE.body, color: COLORS.paleFern, marginBottom: SPACING.s24 },
+  heroSubtitle: {
+    ...TYPE.body,
+    color: COLORS.paleFern,
+    marginBottom: SPACING.s24,
+  },
   darkPanel: {
     backgroundColor: COLORS.forestDepths,
     borderWidth: 1,
@@ -247,7 +305,7 @@ const styles = StyleSheet.create({
   label: {
     ...TYPE.caption,
     color: COLORS.paleFern,
-    fontWeight: '500',
+    fontWeight: "500",
     letterSpacing: 0.8,
     marginBottom: SPACING.s8,
   },
@@ -263,8 +321,8 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.s16,
   },
   passwordRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     borderWidth: 1,
     borderColor: COLORS.mossShadow,
     borderRadius: RADIUS.input,
@@ -272,22 +330,37 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.forestDepths,
     marginBottom: SPACING.s16,
   },
-  passwordInput: { flex: 1, paddingVertical: 14, fontSize: 15, color: COLORS.pureWhite },
-  toggleText: { ...TYPE.caption, fontWeight: '600', color: COLORS.electricSprout, marginLeft: SPACING.s8 },
+  passwordInput: {
+    flex: 1,
+    paddingVertical: 14,
+    fontSize: 15,
+    color: COLORS.pureWhite,
+  },
+  toggleText: {
+    ...TYPE.caption,
+    fontWeight: "600",
+    color: COLORS.electricSprout,
+    marginLeft: SPACING.s8,
+  },
   inputFocused: { borderColor: COLORS.electricSprout },
   instSection: { marginBottom: SPACING.s16 },
   instStatusRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: SPACING.s8,
     paddingVertical: SPACING.s8,
   },
   instStatusText: { ...TYPE.caption, color: COLORS.paleFern },
-  retryLink: { ...TYPE.caption, fontWeight: '600', color: COLORS.electricSprout, textDecorationLine: 'underline' },
+  retryLink: {
+    ...TYPE.caption,
+    fontWeight: "600",
+    color: COLORS.electricSprout,
+    textDecorationLine: "underline",
+  },
   instChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     borderWidth: 1,
     borderColor: COLORS.onyxOlive,
     borderRadius: RADIUS.card,
@@ -297,10 +370,10 @@ const styles = StyleSheet.create({
   },
   instChipSelected: { borderColor: COLORS.electricSprout },
   instTextWrap: { flex: 1, marginRight: SPACING.s8 },
-  instName: { fontSize: 14, fontWeight: '600', color: COLORS.pureWhite },
+  instName: { fontSize: 14, fontWeight: "600", color: COLORS.pureWhite },
   instNameSelected: { color: COLORS.electricSprout },
   instLocation: { ...TYPE.caption, color: COLORS.lichenSage, marginTop: 2 },
-  instCheck: { fontSize: 15, fontWeight: '700', color: COLORS.electricSprout },
+  instCheck: { fontSize: 15, fontWeight: "700", color: COLORS.electricSprout },
   errorBox: {
     borderWidth: 1,
     borderColor: COLORS.electricSprout,
@@ -310,7 +383,10 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.mossShadow,
   },
   errorText: { ...TYPE.body, color: COLORS.electricSprout },
-  linkRow: { marginTop: SPACING.s24, alignItems: 'center' },
+  linkRow: { marginTop: SPACING.s24, alignItems: "center" },
   linkText: { ...TYPE.body, color: COLORS.paleFern },
-  linkUnderline: { color: COLORS.electricSprout, textDecorationLine: 'underline' },
+  linkUnderline: {
+    color: COLORS.electricSprout,
+    textDecorationLine: "underline",
+  },
 });
