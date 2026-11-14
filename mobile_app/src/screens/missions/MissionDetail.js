@@ -25,6 +25,8 @@ export function MissionDetail({route}) {
   return <ScrollView style={s.page} contentContainerStyle={s.content}>
     <View style={s.hero}><Text style={s.heroNote}>Due {mission.due_on}</Text>
       <Text style={s.heroTitle}>{mission.title}</Text><Text style={s.heroNote}>{mission.brief}</Text></View>
+    {checked.length === mission.tasks.length && <View style={s.card}><Text style={s.meta}>COMPLETED</Text>
+      <Text style={s.title}>Mission complete</Text><Text style={s.body}>All {mission.tasks.length} tasks are recorded for your campus.</Text></View>}
     <View style={s.card}><Text style={s.title}>Field checklist</Text>
       <Text style={s.meta}>{checked.length} of {mission.tasks.length} completed</Text>
       <ProgressBar percentage={100 * checked.length / mission.tasks.length} />
