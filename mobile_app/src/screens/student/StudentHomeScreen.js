@@ -157,6 +157,10 @@ export const StudentHomeScreen = ({ navigation }) => {
           )}
         </Pressable>
 
+        <Pressable accessibilityRole="button" onPress={() => navigation.navigate('MissionBoard')}>
+          <Card><Text style={styles.cardTitle}>Campus missions →</Text>
+            <Text style={styles.cardBody}>View assignments and track your checklist.</Text></Card>
+        </Pressable>
         {resume && <Pressable accessibilityRole="button" onPress={() => navigation.navigate('ModuleDetail', { moduleId: resume.id })}>
           <Card><Text style={styles.cardTitle}>Continue learning</Text><Text style={styles.cardBody}>{resume.title}</Text></Card>
         </Pressable>}
