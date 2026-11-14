@@ -1,5 +1,6 @@
 import { FilterRow } from '../../components/ListControls';
 import { MissionComposer } from '../missions/MissionComposer';
+import { MissionReport } from '../missions/MissionReport';
 import React, { useEffect, useState } from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -82,6 +83,7 @@ function CampusForm({ alert }) {
 
 export function CampusDashboard() {
   const { signOut } = useAuth();
+  const [missionRevision, refreshMissions] = useState(0);
   const [section, setSection] = useState("Overview");
   const [stats, setStats] = useState(null);
   const [error, setError] = useState('');
@@ -119,7 +121,7 @@ export function CampusDashboard() {
           {(stats || error) ? <PrimaryButton style={styles.refresh} variant="outlineLight"
             label="Refresh metrics" onPress={() => setRevision(value => value + 1)} /> : null}
         </Card>}
-        {section === "Overview" && <MissionComposer />}
+        {section === "Overview" && <View style={{gap:16}}><MissionReport revision={missionRevision} /><MissionComposer onPublished={()=>refreshMissions(n=>n+1)} /></View>}
         <View style={section !== "Alerts" && {display:"none"}}><CampusForm alert /></View>
         <View style={section !== "Contacts" && {display:"none"}}><CampusForm alert={false} /></View>
       </ScrollView>
