@@ -1,5 +1,6 @@
 // Shared Alerts feed with focus refresh, Forest Depths summary header, and formatted timestamps.
 
+import { SearchField, FilterRow } from '../../components/ListControls';
 import React, { useCallback, useState } from 'react';
 import { FlatList, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
@@ -38,6 +39,7 @@ const AlertsHeader = ({ count }) => (
 );
 
 export const AlertsScreen = () => {
+  const [severity, setSeverity] = React.useState('All');
   const [alerts, setAlerts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -71,16 +73,16 @@ export const AlertsScreen = () => {
     <FlatList
       style={styles.list}
       contentContainerStyle={styles.container}
-      data={alerts}
+      data={alerts.filter(item => severity === 'All' || item.severity === severity.toLowerCase())}
       keyExtractor={(item) => item.id}
       refreshControl={
         <RefreshControl refreshing={isRefreshing} onRefresh={() => loadAlerts(true)} />
       }
-      ListHeaderComponent={<AlertsHeader count={alerts.length} />}
+      ListHeaderComponent={<><AlertsHeader count={alerts.length} /><FilterRow value={severity} options={['All', 'Info', 'Warning', 'Critical']} onChange={setSeverity} /></>}
       ListEmptyComponent={
         <EmptyState
-          title="No active alerts"
-          subtitle="Your institution has not posted any alerts yet."
+          title="No matching alerts"
+          subtitle="Check your filters or refresh the feed."
         />
       }
       renderItem={({ item }) => (
