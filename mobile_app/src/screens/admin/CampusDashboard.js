@@ -91,6 +91,7 @@ export function CampusDashboard() {
             <Text style={styles.heading}>Preparedness score</Text>
             <Text style={styles.score}>{stats.preparedness_score}%</Text>
             <Text>{stats.total_students} enrolled students</Text>
+            {stats.metrics && <Text style={styles.label}>{stats.metrics.completed_lessons_count} lessons completed · {stats.metrics.total_quiz_attempts} quiz attempts · {stats.metrics.drill_participants_count} drill participants</Text>}
             {indicators.map(([label, key]) => <View key={key}>
               <Text style={styles.label}>{label} · {stats[key]}%</Text>
               <ProgressBar percentage={stats[key]} />

@@ -1,5 +1,6 @@
 // Institution leaderboard with pinned Forest Depths standing card and highlighted top 3 ranks.
 
+import { SearchField, FilterRow } from '../../components/ListControls';
 import React, { useCallback, useState } from 'react';
 import { FlatList, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
@@ -107,6 +108,7 @@ const LeaderboardRow = ({ item, isCurrentUser }) => {
 
 // Displays top 20 students for the user's institution with pull-to-refresh and focus updates.
 export const LeaderboardScreen = () => {
+  const [limit, setLimit] = React.useState('20');
   const [board, setBoard] = useState({ leaderboard: [], current_user: null, total_students: 0 });
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -117,7 +119,7 @@ export const LeaderboardScreen = () => {
     else setIsLoading(true);
     setError('');
     try {
-      const data = await getLeaderboard(20);
+      const data = await getLeaderboard(Number(limit));
       setBoard(data || { leaderboard: [], current_user: null, total_students: 0 });
     } catch (err) {
       setError(err.message || 'Unable to load campus leaderboard.');
@@ -125,7 +127,7 @@ export const LeaderboardScreen = () => {
       setIsLoading(false);
       setIsRefreshing(false);
     }
-  }, []);
+  }, [limit]);
 
   useFocusEffect(
     useCallback(() => {
@@ -143,6 +145,7 @@ export const LeaderboardScreen = () => {
   return (
     <View style={styles.screen}>
       <PinnedStandingCard currentUser={board.current_user} totalStudents={totalStudents} />
+      <FilterRow value={limit} options={['10', '20', '50']} onChange={setLimit} />
       <FlatList
         style={styles.list}
         contentContainerStyle={styles.container}
