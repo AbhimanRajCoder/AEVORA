@@ -40,6 +40,7 @@ const AlertsHeader = ({ count }) => (
 
 export const AlertsScreen = () => {
   const [severity, setSeverity] = React.useState('All');
+  const [query, setQuery] = React.useState('');
   const [alerts, setAlerts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -73,12 +74,12 @@ export const AlertsScreen = () => {
     <FlatList
       style={styles.list}
       contentContainerStyle={styles.container}
-      data={alerts.filter(item => severity === 'All' || item.severity === severity.toLowerCase())}
+      data={alerts.filter(item => (severity === 'All' || item.severity === severity.toLowerCase()) && (item.title + ' ' + item.message).toLowerCase().includes(query.trim().toLowerCase()))}
       keyExtractor={(item) => item.id}
       refreshControl={
         <RefreshControl refreshing={isRefreshing} onRefresh={() => loadAlerts(true)} />
       }
-      ListHeaderComponent={<><AlertsHeader count={alerts.length} /><FilterRow value={severity} options={['All', 'Info', 'Warning', 'Critical']} onChange={setSeverity} /></>}
+      ListHeaderComponent={<><AlertsHeader count={alerts.length} /><SearchField value={query} onChange={setQuery} label="Search notices" /><FilterRow value={severity} options={['All', 'Info', 'Warning', 'Critical']} onChange={setSeverity} /></>}
       ListEmptyComponent={
         <EmptyState
           title="No matching alerts"
