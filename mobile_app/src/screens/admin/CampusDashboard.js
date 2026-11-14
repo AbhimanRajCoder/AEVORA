@@ -1,4 +1,5 @@
 import { FilterRow } from '../../components/ListControls';
+import { MissionComposer } from '../missions/MissionComposer';
 import React, { useEffect, useState } from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -118,6 +119,7 @@ export function CampusDashboard() {
           {(stats || error) ? <PrimaryButton style={styles.refresh} variant="outlineLight"
             label="Refresh metrics" onPress={() => setRevision(value => value + 1)} /> : null}
         </Card>}
+        {section === "Overview" && <MissionComposer />}
         <View style={section !== "Alerts" && {display:"none"}}><CampusForm alert /></View>
         <View style={section !== "Contacts" && {display:"none"}}><CampusForm alert={false} /></View>
       </ScrollView>
