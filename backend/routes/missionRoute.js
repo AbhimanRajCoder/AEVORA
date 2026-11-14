@@ -1,3 +1,5 @@
+import { requireAdmin, requireRole } from '../middleware/role.js';
+import { missionDraft } from '../validators/missionValidator.js';
 import { Router } from 'express';
 import { requireAuth } from '../middleware/auth.js';
 import { supabase } from '../config/supabase.js';
@@ -13,6 +15,14 @@ router.get('/', async (req, res) => {
     .eq('institution_id', req.user.institution_id).order('due_on').order('id');
   if (error) throw error;
   return sendSuccess(res, data);
+});
+
+router.post('/', requireAdmin, async (req, res) => {
+  const draft = missionDraft(req.body);
+  const { data, error } = await supabase.from('campus_missions')
+    .insert({ ...draft, institution_id: req.user.institution_id }).select('id').single();
+  if (error) throw error;
+  return sendSuccess(res, data, 201);
 });
 
 export default router;
