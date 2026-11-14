@@ -2274,3 +2274,22 @@ ALTER TABLE public.mission_checks ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON public.mission_checks FROM anon, authenticated;
 GRANT SELECT, INSERT, DELETE ON public.mission_checks TO service_role;
 CREATE INDEX IF NOT EXISTS mission_checks_student ON public.mission_checks(student_id, mission_id);
+
+CREATE OR REPLACE FUNCTION public.mission_participation(campus uuid)
+RETURNS TABLE(mission_id uuid, started bigint, finished bigint, enrolled bigint)
+LANGUAGE sql STABLE SECURITY INVOKER SET search_path = '' AS $$
+  WITH students AS (
+    SELECT id FROM public.profiles WHERE institution_id = campus AND role = 'student'
+  ), progress AS (
+    SELECT c.mission_id, c.student_id, count(*) AS checked FROM public.mission_checks c
+    JOIN students s ON s.id = c.student_id
+    JOIN public.campus_missions m ON m.id = c.mission_id AND m.institution_id = campus
+    GROUP BY c.mission_id, c.student_id
+  )
+  SELECT m.id, count(p.student_id), count(p.student_id) FILTER (WHERE p.checked = cardinality(m.tasks)),
+         (SELECT count(*) FROM students)
+  FROM public.campus_missions m LEFT JOIN progress p ON p.mission_id = m.id
+  WHERE m.institution_id = campus GROUP BY m.id;
+$$;
+REVOKE ALL ON FUNCTION public.mission_participation(uuid) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.mission_participation(uuid) TO service_role;

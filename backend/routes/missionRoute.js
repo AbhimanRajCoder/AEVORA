@@ -52,4 +52,10 @@ router.put('/:id/tasks/:index', requireRole(['student']), async (req, res) => {
   return sendSuccess(res, { done: req.body.done });
 });
 
+router.get('/participation', requireAdmin, async (req, res) => {
+  const {data, error} = await supabase.rpc('mission_participation', {campus: req.user.institution_id});
+  if (error) throw error;
+  return sendSuccess(res, data);
+});
+
 export default router;
