@@ -29,6 +29,7 @@ export function MissionBoard({navigation}) {
     {rows.map(row => <View key={row.id} style={s.card}>
       <Text style={s.meta}>Due {row.due_on}</Text><Text style={s.title}>{row.title}</Text>
       <Text style={s.body}>{row.brief}</Text>
+      <PrimaryButton label="Open checklist" onPress={() => navigation.navigate('MissionDetail', {mission:row})} />
     </View>)}
   </ScrollView>;
 }
