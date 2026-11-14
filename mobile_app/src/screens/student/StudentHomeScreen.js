@@ -63,6 +63,7 @@ export const StudentHomeScreen = ({ navigation }) => {
   if (isLoading) return <LoadingState dark message="Loading workspace..." />;
   if (error) return <ErrorState message={error} onRetry={() => loadHomeData()} />;
 
+  const resume = modules.find(item => item.completed_lessons > 0 && !item.is_completed);
   const completedModules = modules.filter((m) => m.is_completed).length;
   const overallProgress =
     modules.length > 0
@@ -153,6 +154,9 @@ export const StudentHomeScreen = ({ navigation }) => {
           )}
         </Pressable>
 
+        {resume && <Pressable accessibilityRole="button" onPress={() => navigation.navigate('ModuleDetail', { moduleId: resume.id })}>
+          <Card><Text style={styles.cardTitle}>Continue learning</Text><Text style={styles.cardBody}>{resume.title}</Text></Card>
+        </Pressable>}
         <Text style={styles.sectionHeading}>
           Quick <Text style={styles.deepVerdantAccent}>actions</Text>
         </Text>
