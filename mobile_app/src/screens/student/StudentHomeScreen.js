@@ -35,7 +35,7 @@ export const StudentHomeScreen = ({ navigation }) => {
   const loadHomeData = useCallback(
     async (refresh = false) => {
       if (refresh) setIsRefreshing(true);
-      else if (modules.length === 0) setIsLoading(true);
+      else setIsLoading(true);
       setError('');
       try {
         const [modulesRes, alertsRes] = await Promise.all([
@@ -52,7 +52,7 @@ export const StudentHomeScreen = ({ navigation }) => {
         setIsRefreshing(false);
       }
     },
-    [modules.length, refreshUser]
+    [refreshUser]
   );
 
   useFocusEffect(

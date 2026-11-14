@@ -164,7 +164,7 @@ export const DrillResultScreen = ({ route, navigation }) => {
         onTryAgain={() =>
           navigation.replace('DrillSimulation', { drillId: targetDrillId, title: drillTitle })
         }
-        onAllDrills={() => navigation.popToTop()}
+        onAllDrills={() => navigation.navigate("StudentTabs", { screen: "Drills" })}
       />
       <View style={styles.lightBand}>
         <View style={styles.sectionHeader}>
