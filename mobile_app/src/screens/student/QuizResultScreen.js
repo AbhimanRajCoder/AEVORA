@@ -1,5 +1,6 @@
 // Quiz result screen displaying score, pass/fail status, reward points, and full answer review.
 
+import { SearchField, FilterRow } from '../../components/ListControls';
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { AtmosphericOrb } from '../../components/AtmosphericOrb';
@@ -11,6 +12,7 @@ import { COLORS, FONTS, RADIUS, SPACING, TYPE } from '../../constants/theme';
 export const QuizResultScreen = ({ route, navigation }) => {
   const { result, moduleId, moduleTitle } = route.params || {};
 
+  const [view, setView] = React.useState('All answers');
   const score = result?.score ?? 0;
   const correctCount = result?.correct_count ?? 0;
   const totalQuestions = result?.total_questions ?? 0;
@@ -91,10 +93,12 @@ export const QuizResultScreen = ({ route, navigation }) => {
           Answer <Text style={styles.accent}>Review</Text>
         </Text>
 
+        <FilterRow value={view} options={['All answers', 'Missed answers']} onChange={setView} />
+        {view === "Missed answers" && review.every(item => item.is_correct) && <Text>No missed answers.</Text>}
         {review.length === 0 ? (
           <EmptyState title="No review items available" />
         ) : (
-          review.map((item, index) => (
+          review.map((item, index) => view === "Missed answers" && item.is_correct ? null : (
             <Card key={item.question_id || String(index)} variant="light">
               <View style={styles.reviewTop}>
                 <Text style={styles.serifIndex}>Question {String(index + 1).padStart(2, '0')}</Text>

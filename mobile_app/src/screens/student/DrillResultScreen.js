@@ -1,5 +1,6 @@
 // Drill result screen showing score, points awarded, expandable step review, and retry actions.
 
+import { SearchField, FilterRow } from '../../components/ListControls';
 import React, { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { AtmosphericOrb } from '../../components/AtmosphericOrb';
@@ -119,6 +120,7 @@ const StepReviewCard = ({ item, isExpanded, onToggle }) => {
 // Displays virtual drill grading results and step-by-step feedback review.
 export const DrillResultScreen = ({ route, navigation }) => {
   const { result, drillId, title } = route.params || {};
+  const [view, setView] = React.useState('All steps');
   const review = result?.review || [];
   const targetDrillId = drillId || result?.scenario_id;
   const drillTitle = result?.title || title || 'Virtual Drill';
@@ -177,10 +179,13 @@ export const DrillResultScreen = ({ route, navigation }) => {
             </Pressable>
           ) : null}
         </View>
+        <FilterRow value={view} options={['All steps', 'Practice again']} onChange={setView} />
+        {view === "Practice again" && review.every(item => item.points_earned >= item.max_points) && <Text>No steps to revisit.</Text>}
         {review.length === 0 ? (
           <EmptyState title="No step review available" />
         ) : (
           review.map((item, idx) => {
+            if (view === "Practice again" && item.points_earned >= item.max_points) return null;
             const stepKey = item.step ?? idx;
             return (
               <StepReviewCard
