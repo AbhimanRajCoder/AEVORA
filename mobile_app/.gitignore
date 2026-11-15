@@ -3,39 +3,59 @@
 # dependencies
 node_modules/
 
-# Expo
+# Environment variables & secrets (Never commit secrets; keep .env.example)
+.env
+.env.*
+!.env.example
+
+# Expo & EAS
 .expo/
 dist/
 web-build/
 expo-env.d.ts
 
-# Native
-.kotlin/
-*.orig.*
+# Native signing keys and certificates
+*.keystore
 *.jks
 *.p8
 *.p12
 *.key
+*.pem
 *.mobileprovision
+
+# Build outputs
+*.apk
+*.aab
+*.xapk
+*.ipa
+
+# Native and generated folders
+.kotlin/
+.gradle/
+build/
+*.orig.*
+/ios
+/android
 
 # Metro
 .metro-health-check*
 
-# debug
+# Debug logs
+*.log
 npm-debug.*
 yarn-debug.*
 yarn-error.*
 
-# macOS
+# macOS & OS
 .DS_Store
-*.pem
+Thumbs.db
 
-# local env files
-.env*.local
-
-# typescript
+# TypeScript
 *.tsbuildinfo
 
-# generated native folders
-/ios
-/android
+# Editor and IDE configurations
+.vscode/
+.idea/
+.claude/
+*.swp
+*.swo

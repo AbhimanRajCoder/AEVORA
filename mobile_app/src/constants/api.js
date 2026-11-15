@@ -1,12 +1,8 @@
 // API base URL and backend route constants read directly from mobile_app/.env (EXPO_PUBLIC_API_BASE_URL).
 
-const rawApiBaseUrl = process.env.EXPO_PUBLIC_API_BASE_URL;
+const FALLBACK_API_BASE_URL = 'https://aevora-qgyd.onrender.com/api/v1';
 
-if (!rawApiBaseUrl) {
-  throw new Error(
-    'Missing EXPO_PUBLIC_API_BASE_URL in mobile_app/.env. Set it to your backend URL (e.g. http://<LAN_IP>:5000/api/v1).'
-  );
-}
+const rawApiBaseUrl = process.env.EXPO_PUBLIC_API_BASE_URL || FALLBACK_API_BASE_URL;
 
 export const API_BASE_URL = rawApiBaseUrl.replace(/\/+$/, '');
 
