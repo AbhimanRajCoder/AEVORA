@@ -107,10 +107,10 @@ export const SignupScreen = ({ navigation }) => {
         keyboardShouldPersistTaps="handled"
       >
         <Text style={styles.heroTitle}>
-          Join <Text style={styles.sproutText}>now.</Text>
+          Create your account
         </Text>
         <Text style={styles.heroSubtitle}>
-          Link your profile to your campus preparedness workspace.
+          Choose your institution to receive campus alerts and assignments.
         </Text>
 
         <View style={styles.darkPanel}>
@@ -128,7 +128,7 @@ export const SignupScreen = ({ navigation }) => {
             onFocus={() => setFocusedField("name")}
             onBlur={() => setFocusedField(null)}
             placeholder="Aarav Sharma"
-            placeholderTextColor={COLORS.lichenSage}
+            placeholderTextColor={COLORS.paleFern}
             returnKeyType="next"
             onSubmitEditing={() => emailRef.current?.focus()}
             textContentType="name"
@@ -149,7 +149,7 @@ export const SignupScreen = ({ navigation }) => {
             onFocus={() => setFocusedField("email")}
             onBlur={() => setFocusedField(null)}
             placeholder="aarav@institution.edu"
-            placeholderTextColor={COLORS.lichenSage}
+            placeholderTextColor={COLORS.paleFern}
             keyboardType="email-address"
             autoCapitalize="none"
             autoCorrect={false}
@@ -176,7 +176,7 @@ export const SignupScreen = ({ navigation }) => {
               onFocus={() => setFocusedField("password")}
               onBlur={() => setFocusedField(null)}
               placeholder="Create password"
-              placeholderTextColor={COLORS.lichenSage}
+              placeholderTextColor={COLORS.paleFern}
               secureTextEntry={!showPassword}
               returnKeyType="done"
               onSubmitEditing={handleSignup}

@@ -68,14 +68,13 @@ export const LoginScreen = ({ navigation }) => {
       >
         <View style={styles.announcementPill}>
           <Text style={styles.announcementText}>
-            Campus Safety · <Text style={styles.sproutText}>AEVORA</Text> v1.0
+            <Text style={styles.sproutText}>AEVORA</Text> · Campus safety
           </Text>
         </View>
 
         <Text style={styles.heroTitle}>Campus sign-in</Text>
         <Text style={styles.heroSubtitle}>
-          Interactive disaster modules, server-graded quizzes, and campus
-          emergency drills.
+          Sign in with your campus account to access lessons, alerts and assignments.
         </Text>
 
         <View style={styles.darkPanel}>
@@ -93,7 +92,7 @@ export const LoginScreen = ({ navigation }) => {
             onFocus={() => setFocusedField("email")}
             onBlur={() => setFocusedField(null)}
             placeholder="student@institution.edu"
-            placeholderTextColor={COLORS.lichenSage}
+            placeholderTextColor={COLORS.paleFern}
             keyboardType="email-address"
             autoCapitalize="none"
             autoCorrect={false}
@@ -120,7 +119,7 @@ export const LoginScreen = ({ navigation }) => {
               onFocus={() => setFocusedField("password")}
               onBlur={() => setFocusedField(null)}
               placeholder="Enter your password"
-              placeholderTextColor={COLORS.lichenSage}
+              placeholderTextColor={COLORS.paleFern}
               secureTextEntry={!showPassword}
               returnKeyType="done"
               onSubmitEditing={handleLogin}
