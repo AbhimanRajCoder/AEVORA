@@ -29,13 +29,23 @@ export function MissionComposer({onPublished}) {
     finally {publishing.current=false; setBusy(false);}
   }
   function preview() {
+    const date = new Date(draft.due_on + 'T00:00:00Z');
+    if (!Number.isFinite(date.getTime()) || date.toISOString().slice(0, 10) !== draft.due_on) {
+      setMessage('Enter a valid deadline in YYYY-MM-DD format.');
+      return;
+    }
     const steps = draft.steps.split('\n').map(x=>x.trim()).filter(Boolean);
+    if (steps.length < 1 || steps.length > 12 || steps.some(step => step.length > 160)) {
+      setMessage('Enter 1–12 checklist steps, up to 160 characters per step.');
+      return;
+    }
+    setMessage('');
     const summary = [draft.brief, 'Due '+draft.due_on, ...steps.map((step,i)=>(i+1)+'. '+step)].join('\n');
     Alert.alert(draft.title, summary, [{text:'Edit',style:'cancel'},{text:'Publish to campus',onPress:publish}]);
   }
   return <View style={s.card}><Text style={s.title}>Assign a campus mission</Text>
-    {fields.map(([key,label,maxLength]) => <View key={key}><Text style={s.body}>{label}</Text>
-      <TextInput accessibilityLabel={label} style={s.input} value={draft[key]} editable={!busy}
+    {fields.map(([key,label,maxLength]) => <View key={key} style={s.field}><Text style={s.fieldLabel}>{label}</Text>
+      <TextInput accessibilityLabel={label} style={[s.input, (key === 'steps' || key === 'brief') && s.multiline]} value={draft[key]} editable={!busy}
         maxLength={maxLength} multiline={key === 'steps' || key === 'brief'}
         onChangeText={text => setDraft(previous => ({...previous,[key]:text}))} /></View>)}
     <PrimaryButton label="Preview mission" onPress={preview} isLoading={busy} disabled={Object.values(draft).some(x=>!x.trim())}/>

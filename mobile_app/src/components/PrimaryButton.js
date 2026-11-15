@@ -57,6 +57,7 @@ export const PrimaryButton = ({
 
 const styles = StyleSheet.create({
   button: {
+    minHeight: 44,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -81,7 +82,8 @@ const styles = StyleSheet.create({
   pressed: { opacity: 0.85 },
   label: {
     fontSize: 15,
-    fontWeight: '500',
+    textAlign: 'center',
+    fontWeight: '600',
     letterSpacing: -0.2,
   },
   textCarbon: { color: COLORS.carbon },

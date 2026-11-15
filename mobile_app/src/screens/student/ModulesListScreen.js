@@ -31,7 +31,7 @@ const DISASTER_FILTERS = [
 
 export const ModulesListScreen = ({ navigation }) => {
   const [query, setQuery] = React.useState('');
-  const [status, setStatus] = React.useState('All lessons');
+  const [status, setStatus] = React.useState('All modules');
   const [modules, setModules] = useState([]);
   const [selectedType, setSelectedType] = useState('all');
   const [isLoading, setIsLoading] = useState(true);
@@ -95,19 +95,19 @@ export const ModulesListScreen = ({ navigation }) => {
         </ScrollView>
       </View>
 
-      <FilterRow value={status} options={['All lessons', 'Unfinished', 'Completed']} onChange={setStatus} />
+      <FilterRow value={status} options={['All modules', 'Unfinished', 'Completed']} onChange={setStatus} />
       <FlatList
         style={styles.list}
         contentContainerStyle={styles.container}
-        data={filteredModules.filter(item => (status === 'All lessons' || item.is_completed === (status === 'Completed')) && item.title.toLowerCase().includes(query.trim().toLowerCase()))}
+        data={filteredModules.filter(item => (status === 'All modules' || item.is_completed === (status === 'Completed')) && item.title.toLowerCase().includes(query.trim().toLowerCase()))}
         keyExtractor={(item) => item.id}
         refreshControl={
           <RefreshControl refreshing={isRefreshing} onRefresh={() => loadModules(true)} />
         }
         ListEmptyComponent={
           <EmptyState
-            title={selectedType === 'all' ? 'No modules available' : `No ${selectedType} modules`}
-            subtitle="Try selecting another disaster category or pull to refresh."
+            title={modules.length ? 'No matching modules' : 'No modules available'}
+            subtitle={modules.length ? "Change your search or filters to see more modules." : "Pull down to refresh the catalogue."}
           />
         }
         renderItem={({ item }) => (
@@ -200,6 +200,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: SPACING.s8,
+    flexWrap: 'wrap',
     flexShrink: 1,
   },
   sproutChip: {

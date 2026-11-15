@@ -16,15 +16,15 @@ export const SEVERITY_STYLES = {
     label: 'INFO',
   },
   warning: {
-    bg: COLORS.boneWhite,
-    text: COLORS.onyxOlive,
-    border: COLORS.paleFern,
+    bg: '#FFF2D4',
+    text: COLORS.warning,
+    border: '#E8CC8B',
     label: 'WARNING',
   },
   critical: {
-    bg: COLORS.forestDepths,
-    text: COLORS.electricSprout,
-    border: COLORS.electricSprout,
+    bg: '#FCE9E7',
+    text: COLORS.danger,
+    border: '#E8B7B1',
     label: 'CRITICAL',
   },
 };

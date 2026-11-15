@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { COLORS, FONTS, SPACING, TYPE } from '../constants/theme';
+import { COLORS, SPACING, TYPE } from '../constants/theme';
 
 export const EmptyState = ({ title = 'Nothing here yet', subtitle = '' }) => (
   <View style={styles.container}>
@@ -18,9 +18,9 @@ const styles = StyleSheet.create({
     padding: SPACING.s32,
   },
   title: {
-    fontFamily: FONTS.serif,
-    fontSize: 18,
-    fontStyle: 'italic',
+    ...TYPE.subheading,
+    fontWeight: '600',
+    textAlign: 'center',
     color: COLORS.onyxOlive,
     marginBottom: SPACING.s8,
   },

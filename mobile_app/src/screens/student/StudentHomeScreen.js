@@ -111,12 +111,7 @@ export const StudentHomeScreen = ({ navigation }) => {
         {modules.length > 0 && completedModules === modules.length && <PrimaryButton label="Practice a drill"
           onPress={() => navigation.navigate('Drills')} />}
         <Card variant="floating" style={styles.floatingCard}>
-          <View style={styles.floatingTop}>
-            <View style={styles.sproutChip}>
-              <Text style={styles.sproutChipText}>Readiness</Text>
-            </View>
-            <Text style={styles.serifNote}>progress</Text>
-          </View>
+          <Text style={styles.cardTitle}>Learning progress</Text>
           <Text style={styles.floatingPercent}>{overallProgress}%</Text>
           <ProgressBar percentage={overallProgress} />
           <Text style={styles.floatingCaption}>
@@ -151,7 +146,7 @@ export const StudentHomeScreen = ({ navigation }) => {
               </View>
               <Text style={styles.cardTitle}>No campus alerts posted</Text>
               <Text style={styles.cardBody}>
-                Tap here anytime to view published institution safety advisories.
+                New notices from your campus will appear here.
               </Text>
             </Card>
           )}
@@ -165,7 +160,7 @@ export const StudentHomeScreen = ({ navigation }) => {
           <Card><Text style={styles.cardTitle}>Continue learning</Text><Text style={styles.cardBody}>{resume.title}</Text></Card>
         </Pressable>}
         <Text style={styles.sectionHeading}>
-          Quick <Text style={styles.deepVerdantAccent}>actions</Text>
+          Campus resources
         </Text>
 
         <View style={styles.grid}>
@@ -173,9 +168,6 @@ export const StudentHomeScreen = ({ navigation }) => {
             style={({ pressed }) => [styles.gridCard, pressed && styles.pressed]}
             onPress={() => navigation.navigate('Modules')}
           >
-            <View style={styles.sproutChip}>
-              <Text style={styles.sproutChipText}>Learn</Text>
-            </View>
             <Text style={styles.gridTitle}>Modules</Text>
             <Text style={styles.gridSub}>{modules.length} safety courses</Text>
           </Pressable>
@@ -184,10 +176,7 @@ export const StudentHomeScreen = ({ navigation }) => {
             style={({ pressed }) => [styles.gridCard, pressed && styles.pressed]}
             onPress={() => navigation.navigate('Drills')}
           >
-            <View style={styles.sproutChip}>
-              <Text style={styles.sproutChipText}>Practice</Text>
-            </View>
-            <Text style={styles.gridTitle}>Virtual Drills</Text>
+            <Text style={styles.gridTitle}>Virtual drills</Text>
             <Text style={styles.gridSub}>Interactive scenarios</Text>
           </Pressable>
 
@@ -195,9 +184,6 @@ export const StudentHomeScreen = ({ navigation }) => {
             style={({ pressed }) => [styles.gridCard, pressed && styles.pressed]}
             onPress={() => navigation.navigate('Leaderboard')}
           >
-            <View style={styles.sproutChip}>
-              <Text style={styles.sproutChipText}>03 · Rank</Text>
-            </View>
             <Text style={styles.gridTitle}>Leaderboard</Text>
             <Text style={styles.gridSub}>Campus standings</Text>
           </Pressable>
@@ -206,9 +192,6 @@ export const StudentHomeScreen = ({ navigation }) => {
             style={({ pressed }) => [styles.gridCard, pressed && styles.pressed]}
             onPress={() => navigation.navigate('Emergency')}
           >
-            <View style={styles.sproutChip}>
-              <Text style={styles.sproutChipText}>04 · SOS</Text>
-            </View>
             <Text style={styles.gridTitle}>Helplines</Text>
             <Text style={styles.gridSub}>112 & campus desk</Text>
           </Pressable>
@@ -268,7 +251,7 @@ const styles = StyleSheet.create({
   heroHeadline: { fontFamily: FONTS.display, ...TYPE.displayHero, color: COLORS.pureWhite, marginBottom: SPACING.s16 },
   sproutAccent: { color: COLORS.electricSprout },
   heroSubcopy: { ...TYPE.bodyMd, color: COLORS.paleFern, marginBottom: SPACING.s24 },
-  floatingCard: { transform: [{ rotate: '-1.5deg' }], marginBottom: 0 },
+  floatingCard: { marginBottom: 0 },
   floatingTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -298,21 +281,22 @@ const styles = StyleSheet.create({
   cardBody: { ...TYPE.body, color: COLORS.lichenSage },
   sectionHeading: { ...TYPE.heading, color: COLORS.onyxOlive, marginTop: SPACING.s8, marginBottom: SPACING.s16 },
   deepVerdantAccent: { color: COLORS.deepVerdant },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
   gridCard: {
-    width: '48%',
+    flexGrow: 1,
+    flexBasis: 146,
     backgroundColor: COLORS.boneWhite,
     borderWidth: 1,
     borderColor: COLORS.mistGreen,
     borderRadius: RADIUS.card,
     padding: SPACING.s16,
-    marginBottom: SPACING.s16,
+    justifyContent: 'center',
+    minHeight: 92,
   },
   gridTitle: {
     ...TYPE.subheading,
     fontWeight: '600',
     color: COLORS.onyxOlive,
-    marginTop: SPACING.s16,
     marginBottom: 4,
   },
   gridSub: { ...TYPE.caption, color: COLORS.lichenSage },

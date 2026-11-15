@@ -22,7 +22,7 @@ export function MissionReport({revision=0}) {
     return ()=>{current=false;};
   },[revision,version]);
   return <View style={s.card}><Text style={s.title}>Mission participation</Text>
-    {rows.map(row=><View key={row.id} style={s.card}><Text style={s.meta}>Due {row.due_on}</Text>
+    {rows.map(row=><View key={row.id} style={s.reportRow}><Text style={s.meta}>Due {row.due_on}</Text>
       <Text style={s.title}>{row.title}</Text><Text style={s.body}>{row.finished} of {row.enrolled} students finished</Text>
       <ProgressBar percentage={row.enrolled ? 100*row.finished/row.enrolled : 0}/>
       <Text style={s.body}>{row.started-row.finished} in progress · {row.enrolled-row.started} yet to start</Text></View>)}
